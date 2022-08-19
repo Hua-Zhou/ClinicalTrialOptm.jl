@@ -1,0 +1,13 @@
+name = "ClinicalTrialOptm"
+uuid = "8796d277-b3d7-4205-96c1-d40f4fa55f1f"
+authors = ["Hua Zhou <huazhou@ucla.edu>", "Arin Vansomphone <avansomphone@gmail.com>"]
+version = "0.1.0"
+
+[compat]
+julia = "1.7"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
