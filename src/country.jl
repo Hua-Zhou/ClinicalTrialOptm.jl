@@ -28,14 +28,14 @@ function Country(
 end
 
 """ 
-mean(ctry :: Country)
+    mean(ctry :: Country)
 
 Mean number of patients enrolled by a center in country `ctry`.
 """
 mean(ctry :: Country) = ctry.m * (1 - ctry.d) * (ctry.Td - mean(ctry.T₀))
 
 """ 
-var(ctry :: Country)
+    var(ctry :: Country)
 
 Variance of the number of patients enrolled by a center in country `ctry`.
 """
@@ -45,7 +45,7 @@ var(ctry :: Country) =
     ctry.m * (1 - ctry.d) * (ctry.Td - mean(ctry.T₀))
 
 """
-pgf(ctry, z)
+    pgf(ctry, z)
 
 Probability generating function of the number of patients enrolled by one 
 center in country `ctry`.     

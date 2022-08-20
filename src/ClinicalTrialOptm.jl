@@ -2,8 +2,9 @@ module ClinicalTrialOptm
 
 using Distributions, QuadGK
 import Statistics: mean, var
-export Country, mean, pgf, var
+export ClinicalTrial, Country, mean, pgf, var
 
 include("country.jl")
+include("clinicaltrial.jl")
 
 end
