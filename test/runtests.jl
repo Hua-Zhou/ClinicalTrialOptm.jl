@@ -37,11 +37,14 @@ using Distributions, ForwardDiff, LinearAlgebra, Random, Test, UnicodePlots
         )
     )
     println()        
-    @info "empirical mean"
+    @info "empirical mean/var"
     # @show ctry_pmf
     @show length(ctry_pmf)
     @show sum(ctry_pmf)
-    @show dot(0:(length(ctry_pmf)-1), ctry_pmf)
+    μ̂ = dot(0:(length(ctry_pmf)-1), ctry_pmf)
+    σ̂² = dot(abs2.(0:(length(ctry_pmf)-1)), ctry_pmf) - abs2(μ̂)
+    println("μ̂ = $μ̂")
+    println("σ̂² = $σ̂²")
 end
 
 @testset "ClinicalTrial" begin
@@ -83,9 +86,12 @@ end
         )
     )
     println()
-    @info "empirical mean"
+    @info "empirical mean/var"
     # @show ct_pmf
     @show length(ct_pmf)
     @show sum(ct_pmf)
-    @show dot(0:(length(ct_pmf)-1), ct_pmf)
+    μ̂ = dot(0:(length(ct_pmf)-1), ct_pmf)
+    σ̂² = dot(abs2.(0:(length(ct_pmf)-1)), ct_pmf) - abs2(μ̂)
+    println("μ̂ = $μ̂")
+    println("σ̂² = $σ̂²")
 end
