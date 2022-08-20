@@ -58,3 +58,18 @@ clinical trial `ct`.
 """
 pgf(ct :: ClinicalTrial, z) = 
     mapreduce((c, x) -> pgf(c, z)^x, *, ct.countries, ct.centers)
+
+"""
+    pmf(ct :: ClinicalTrial)
+
+Probability mass function of the number of patients enrolled in a
+clinical trial `ct`, by FFT of its pgf.
+"""
+function pmf(ct :: ClinicalTrial)
+    # support of pmf is [0, n - 1]
+    μ, σ² = mean(ct), var(ct)
+    n = 2^ceil(log2(μ + 10sqrt(σ²)))
+    # fft
+    pmf = max.(real.(fft!([pgf(ct, exp(2π * im * j / n)) for j in 0:(n-1)])), 0)
+    pmf ./= sum(pmf)
+end

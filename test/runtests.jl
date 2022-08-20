@@ -1,5 +1,5 @@
 using ClinicalTrialOptm
-using Distributions, ForwardDiff, Random, Test
+using Distributions, ForwardDiff, LinearAlgebra, Random, Test, UnicodePlots
 
 @testset "Country" begin
     m = 1.5
@@ -25,6 +25,23 @@ using Distributions, ForwardDiff, Random, Test
         t -> ForwardDiff.derivative(z -> pgf(ctry, z), t), 
         1.0
         ) ≈ var(ctry) + mean(ctry)^2 - mean(ctry)
+    @info "pmf of a center"
+    ctry_pmf = pmf(ctry)
+    pltrange = 0:200
+    display(
+        lineplot(
+            pltrange, 
+            ctry_pmf[pltrange .+ 1], 
+            xlabel = "Number of patients", 
+            ylabel = "Probability"
+        )
+    )
+    println()        
+    @info "empirical mean"
+    # @show ctry_pmf
+    @show length(ctry_pmf)
+    @show sum(ctry_pmf)
+    @show dot(0:(length(ctry_pmf)-1), ctry_pmf)
 end
 
 @testset "ClinicalTrial" begin
@@ -37,10 +54,10 @@ end
     c₀ = rand(rng, 15000.0:1000.0:25000.0, nc)
     c = rand(rng, 4000.0:200.0:5000.0, nc)
     q = rand(rng, 1000.0:200.0:2000.0, nc)
-    d = rand(rng, 0.01:0.01:0.15, nc)
+    d = rand(rng, 0.1:0.02:0.2, nc)
     T₀ = fill(Uniform(0.0, 6.0), nc)
-    Td = 24.0
-    centers = rand(rng, 10:20, nc)
+    Td = 15.0
+    centers = rand(rng, 5:15, nc)
     ct = ClinicalTrial(m, s², l, u, c₀, c, q, d, T₀, Td, centers)
     @info "mean/var of a clinical trial"
     @show mean(ct)
@@ -54,4 +71,21 @@ end
         t -> ForwardDiff.derivative(z -> pgf(ct, z), t), 
         1.0
         ) ≈ var(ct) + mean(ct)^2 - mean(ct)
+    @info "pmf of a clinical trial"
+    ct_pmf = pmf(ct)
+    pltrange = 550:1200
+    display(
+        lineplot(
+            pltrange, 
+            ct_pmf[pltrange .+ 1], 
+        xlabel = "Number of patients", 
+        ylabel = "Probability"
+        )
+    )
+    println()
+    @info "empirical mean"
+    # @show ct_pmf
+    @show length(ct_pmf)
+    @show sum(ct_pmf)
+    @show dot(0:(length(ct_pmf)-1), ct_pmf)
 end

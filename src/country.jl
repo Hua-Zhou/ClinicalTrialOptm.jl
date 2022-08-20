@@ -62,3 +62,18 @@ function pgf(
     I, _ = quadgk(t -> (1 + θ * (1 - d) * (Td - t) * (1 - z))^(-α) * pdf(T₀, t), minimum(ctry.T₀), maximum(ctry.T₀))
     I
 end
+
+"""
+    pmf(ctry :: Country)
+
+Probability mass function of the number of patients enrolled in a
+center in country `ctry`, by FFT of its pgf.
+"""
+function pmf(ctry :: Country)
+    μ, σ² = mean(ctry), var(ctry)
+    # support of pmf is [0, n - 1]
+    n = 2^ceil(log2(μ + 10sqrt(σ²)))
+    # fft
+    pmf = max.(real.(fft!([pgf(ctry, exp(2π * im * j / n)) for j in 0:(n-1)])), 0)
+    pmf ./= sum(pmf)
+end
