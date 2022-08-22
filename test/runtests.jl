@@ -53,7 +53,7 @@ end
     m = rand(rng, Uniform(1.0, 2.0), nc)
     s² = rand(rng, Uniform(1.0, 2.0), nc)
     l = rand(rng, 1:3, nc)
-    u = l .+ rand(rng, 10:30, nc)
+    u = l .+ rand(rng, 50:100, nc)
     c₀ = rand(rng, 15000.0:1000.0:25000.0, nc)
     c = rand(rng, 4000.0:200.0:5000.0, nc)
     q = rand(rng, 1000.0:200.0:2000.0, nc)
@@ -95,7 +95,10 @@ end
     σ̂² = dot(abs2.(0:(length(ct_pmf)-1)), ct_pmf) - abs2(μ̂)
     println("μ̂ = $μ̂")
     println("σ̂² = $σ̂²")
-    @info "optdes!"
+    @info "optdes! (pos = 0.49)"
     optdes!(ct, 500, ps = 0.49)
+    show(ct)
+    @info "optdes! (pos = 0.95)"
+    optdes!(ct, 500, ps = 0.95)
     show(ct)
 end
