@@ -52,7 +52,7 @@ end
     nc = 5 # number of countries
     m = rand(rng, Uniform(1.0, 2.0), nc)
     s² = rand(rng, Uniform(1.0, 2.0), nc)
-    l = rand(rng, 0:2, nc)
+    l = rand(rng, 1:3, nc)
     u = l .+ rand(rng, 10:30, nc)
     c₀ = rand(rng, 15000.0:1000.0:25000.0, nc)
     c = rand(rng, 4000.0:200.0:5000.0, nc)
@@ -62,6 +62,7 @@ end
     Td = 15.0
     centers = rand(rng, 5:15, nc)
     ct = ClinicalTrial(m, s², l, u, c₀, c, q, d, T₀, Td, centers)
+    show(ct)
     @info "mean/var of a clinical trial"
     @show mean(ct)
     @show var(ct)
@@ -76,7 +77,7 @@ end
         ) ≈ var(ct) + mean(ct)^2 - mean(ct)
     @info "pmf of a clinical trial"
     ct_pmf = pmf(ct)
-    pltrange = 550:1200
+    pltrange = 450:1300
     display(
         lineplot(
             pltrange, 
@@ -94,4 +95,7 @@ end
     σ̂² = dot(abs2.(0:(length(ct_pmf)-1)), ct_pmf) - abs2(μ̂)
     println("μ̂ = $μ̂")
     println("σ̂² = $σ̂²")
+    @info "optdes!"
+    optdes!(ct, 500, ps = 0.49)
+    show(ct)
 end
