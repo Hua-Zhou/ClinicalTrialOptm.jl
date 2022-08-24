@@ -1,0 +1,5 @@
+[deps]
+ClinicalTrialOptm = "8796d277-b3d7-4205-96c1-d40f4fa55f1f"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+Pluto = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
+PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
