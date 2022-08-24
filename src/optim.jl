@@ -21,22 +21,26 @@ function optdes!(
     # Φ⁻¹(ϵ)
     c_ϵ = quantile(Normal(), 1 - ps)
     if c_ϵ ≥ 0
-        # set up solvers    
-        oa_solver = optimizer_with_attributes(HiGHS.Optimizer,
-            MOI.Silent() => true,
-            "mip_feasibility_tolerance" => 1e-8,
-            "mip_rel_gap" => 1e-6,
-        )
-        # conic_solver = optimizer_with_attributes(Hypatia.Optimizer, 
+        # # set up Pajarito solvers    
+        # oa_solver = optimizer_with_attributes(HiGHS.Optimizer,
+        #     MOI.Silent() => true,
+        #     "mip_feasibility_tolerance" => 1e-8,
+        #     "mip_rel_gap" => 1e-6,
+        # )
+        # # conic_solver = optimizer_with_attributes(Hypatia.Optimizer, 
+        # #     MOI.Silent() => true,
+        # # )
+        # conic_solver = optimizer_with_attributes(SCS.Optimizer, 
         #     MOI.Silent() => true,
         # )
-        conic_solver = optimizer_with_attributes(SCS.Optimizer, 
-            MOI.Silent() => true,
-        )
-        opt = optimizer_with_attributes(Pajarito.Optimizer,
-            "time_limit" => 600, 
-            "oa_solver" => oa_solver, 
-            "conic_solver" => conic_solver,
+        # opt = optimizer_with_attributes(Pajarito.Optimizer,
+        #     "time_limit" => 600, 
+        #     "oa_solver" => oa_solver, 
+        #     "conic_solver" => conic_solver,
+        # )
+        # set up KNITRO solver
+        opt = optimizer_with_attributes(
+            KNITRO.Optimizer
         )
         # set up model
         model = Model(opt)
