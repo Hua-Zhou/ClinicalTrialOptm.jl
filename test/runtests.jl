@@ -48,7 +48,7 @@ using Distributions, ForwardDiff, LinearAlgebra, Random, Test, UnicodePlots
 end
 
 @testset "ClinicalTrial" begin
-    rng = MersenneTwister(123)
+    rng = MersenneTwister(1)
     nc = 5 # number of countries
     m = rand(rng, Uniform(1.0, 2.0), nc)
     s² = rand(rng, Uniform(1.0, 2.0), nc)
@@ -95,9 +95,10 @@ end
     σ̂² = dot(abs2.(0:(length(ct_pmf)-1)), ct_pmf) - abs2(μ̂)
     println("μ̂ = $μ̂")
     println("σ̂² = $σ̂²")
-    @info "optdes! (pos = 0.49)"
-    optdes!(ct, 500, ps = 0.49)
-    show(ct)
+    # optimal design
+    # @info "optdes! (pos = 0.49)"
+    # optdes!(ct, 500, ps = 0.49)
+    # show(ct)
     @info "optdes! (pos = 0.95)"
     optdes!(ct, 500, ps = 0.95)
     show(ct)

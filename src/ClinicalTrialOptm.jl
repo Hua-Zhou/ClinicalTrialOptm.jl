@@ -1,7 +1,7 @@
 module ClinicalTrialOptm
 
-using Distributions, FFTW, HiGHS, QuadGK, Ipopt, JuMP, Juniper, 
-    Pajarito, PrettyTables, SCS
+using Cbc, Distributions, FFTW, HiGHS, QuadGK, Ipopt, JuMP, Juniper, 
+    KNITRO, Pajarito, PrettyTables, SCS
 import Statistics: mean, var
 export ClinicalTrial, Country, mean, mean_cost, pgf, pmf, var, optdes!
 

@@ -42,50 +42,61 @@ function optdes!(
         model = Model(opt)
         @variable(
             model, 
-            ct.countries[i].l ≤ x[i = 1:J] ≤ ct.countries[i].u,
+            ct.countries[j].l ≤ x[j = 1:J] ≤ ct.countries[j].u,
             integer = true
         )
         @variable(model, μ)
         @variable(model, σ²)
+        @objective(model, Min, sum(c_f[j] * x[j] for j in 1:J))
         @constraint(model, μ == sum(c_μ[j] * x[j] for j in 1:J))
         @constraint(model, σ² == sum(c_σ²[j] * x[j] for j in 1:J))
-        @objective(model, Min, sum(c_f[j] * x[j] for j in 1:J))
         @constraint(model, [σ²; 0.5abs2(c_ϵ); ntarget - μ] in RotatedSecondOrderCone())
     else # c_ϵ < 0
-        nl_solver = optimizer_with_attributes(
-            Ipopt.Optimizer, 
-            MOI.Silent() => true, 
-            "sb" => "yes", 
-            "max_iter"   => 9999
-        )
-        mip_solver = optimizer_with_attributes(
-            HiGHS.Optimizer, 
-            "output_flag" => false
-        )
+        # # set up Juniper solver
+        # nl_solver = optimizer_with_attributes(
+        #     Ipopt.Optimizer, 
+        #     MOI.Silent() => true, 
+        #     "sb" => "yes", 
+        #     "max_iter"   => 9999
+        # )
+        # mip_solver = optimizer_with_attributes(
+        #     HiGHS.Optimizer, 
+        #     "output_flag" => false
+        # )
+        # # mip_solver = optimizer_with_attributes(
+        # #     Cbc.Optimizer, 
+        # #     "logLevel" => 0
+        # # )
+        # minlp = optimizer_with_attributes(
+        #     Juniper.Optimizer, 
+        #     "mip_solver" => mip_solver, 
+        #     "nl_solver" => nl_solver,
+        #     # "traverse_strategy" => :DBFS,
+        #     # "processors" => 4
+        # )
+        # set up KNITRO solver
         minlp = optimizer_with_attributes(
-            Juniper.Optimizer, 
-            "mip_solver" => mip_solver, 
-            "nl_solver" => nl_solver
+            KNITRO.Optimizer
         )
         # set up model
         model = Model(minlp)
         @variable(
             model, 
-            ct.countries[i].l ≤ x[i = 1:J] ≤ ct.countries[i].u,
+            ct.countries[j].l ≤ x[j = 1:J] ≤ ct.countries[j].u,
             integer = true
         )
-        @variable(model, μ)
+        @variable(model, μ ≥ ntarget)
         @variable(model, σ²)
+        @objective(model, Min, sum(c_f[j] * x[j] for j in 1:J))
         @constraint(model, μ == sum(c_μ[j] * x[j] for j in 1:J))
         @constraint(model, σ² == sum(c_σ²[j] * x[j] for j in 1:J))
-        @objective(model, Min, sum(c_f[j] * x[j] for j in 1:J))
-        @constraint(model, μ ≥ ntarget)
         @NLconstraint(model, abs2(c_ϵ) * σ² ≤ abs2(ntarget - μ))
+        # @NLconstraint(model, μ + c_ϵ * sqrt(σ²) ≥ ntarget)
     end
     # solvers
     @time optimize!(model)
     @show solution_summary(model)
-    @show ct.centers .= round.(Int, value.(x))
+    ct.centers .= round.(Int, value.(x))
     @show termination_status(model)
     @show primal_status(model)
     @show objective_value(model)
