@@ -50,7 +50,7 @@ var(ctry :: Country) =
 Mean cost of a center in country `ctry`.
 """
 mean_cost(ctry :: Country) = ctry.c₀ + 
-    (ctry.c + ctry.q * ctry.m) * (1 - ctry.d) * (ctry.Td - mean(ctry.T₀))
+    (ctry.c + ctry.q * ctry.m * (1 - ctry.d)) * (ctry.Td - mean(ctry.T₀))
 
 """
     pgf(ctry, z)
