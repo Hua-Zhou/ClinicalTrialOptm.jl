@@ -9,6 +9,11 @@ function optdes!(
     ntarget :: Integer;
     ps :: Real = 0.5
     )
+    # test whether the lb is optimal
+    (lbtest(ct, ntarget, ps = ps) == :lb_optimal) && (return :opm_successful)
+    # test whether the problem is infeasible by checking upper bound
+    (ubtest(ct, ntarget, ps = ps) == :ub_infeasible) && (return :opm_infeasible)
+    # MIP
     ct.ntarget[1] = ntarget
     # number of countries
     J = length(ct.countries)
@@ -108,3 +113,46 @@ function optdes!(
     ct
 end
 
+"""
+    TODO
+"""
+function lbtest(
+    ct :: ClinicalTrial,
+    ntarget :: Integer;
+    ps :: Real = 0.5
+    )
+    l = [ct.countries[j].l for j in 1:length(ct.countries)]
+    copyto!(ct.centers, l)
+    μ, σ² = mean(ct), var(ct)
+    PoS = (ccdf(Normal(μ, sqrt(σ²)), ntarget))
+    println("Probability of success: $PoS")
+    if PoS > ps
+        println("The optimal solution is the lower bound of the centers.")
+        return :lb_optimal
+    else 
+        println("The optimal solution is not the lower bound of the centers.")
+        return :lb_not_optimal
+    end
+end
+
+"""
+    TODO
+"""
+function ubtest(
+    ct :: ClinicalTrial,
+    ntarget :: Integer;
+    ps :: Real = 0.5
+    )
+    u = [ct.countries[j].u for j in 1:length(ct.countries)]
+    copyto!(ct.centers, u)
+    μ, σ² = mean(ct), var(ct)
+    PoS = (ccdf(Normal(μ, sqrt(σ²)), ntarget))
+    println("Probability of success: $PoS")
+    if PoS < ps
+        println("The optimal solution is infeasible.")
+        return :ub_infeasible
+    else 
+        println("The optimal solution is feasible.")
+        return :ub_feasible
+    end
+end
