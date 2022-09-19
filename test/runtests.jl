@@ -95,6 +95,9 @@ end
     σ̂² = dot(abs2.(0:(length(ct_pmf)-1)), ct_pmf) - abs2(μ̂)
     println("μ̂ = $μ̂")
     println("σ̂² = $σ̂²")
+    @info "cdf"
+    @show cdf(ct, 900)
+    @show sum(ct_pmf[1:901])
     # optimal design
     @info "optdes! (pos = 0.49)"
     optdes!(ct, 500, ps = 0.49)

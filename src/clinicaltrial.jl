@@ -78,6 +78,25 @@ function pmf(ct :: ClinicalTrial)
     pmf ./= sum(pmf)
 end
 
+"""
+    cdf(ct :: ClinicalTrial, x)
+
+Cumulative distribution function of the number of patients enrolled in a
+clinical trial `ct` evaluated at x, P(X ≤ x), by applying the Gil-Pelaez inverstion formula 
+(<https://en.wikipedia.org/wiki/Characteristic_function_(probability_theory)#Inversion_formula>)
+to the characteristic function. 
+"""
+function cdf(ct :: ClinicalTrial, x :: Real)
+    z = round(Int, x) == x ? x + 0.5 : Float64(x)
+    I, _ = quadgk(t -> imag(exp(- im * t * z) * pgf(ct, exp(im * t))) / t, 0, Inf)
+    0.5 - inv(π) * I
+end
+
+"""
+    TODO
+"""
+ccdf(ct :: ClinicalTrial, x :: Real) = 1 - cdf(ct, x)
+
 function Base.show(io::IO, ct::ClinicalTrial)
     println(io)
     println(io, "Global Clinical Trial:")
@@ -87,7 +106,8 @@ function Base.show(io::IO, ct::ClinicalTrial)
         println(io, "Total duration (months): $(ct.countries[1].Td)")
         println(io, "Target enrollment: $(ct.ntarget[1])")
         μ, σ² = mean(ct), var(ct)
-        println(io, "Probability of success: $(ccdf(Normal(μ, sqrt(σ²)), ct.ntarget[1]))")
+        println(io, "Probability of success (based on normal approximation): $(ccdf(Normal(μ, sqrt(σ²)), ct.ntarget[1]))")
+        println(io, "Probability of success (based on Poisson-Gamma model): $(ccdf(ct, ct.ntarget[1]))")
         μcost = mapreduce((c, x) -> mean_cost(c) * x, +, ct.countries, ct.centers)
         println(io, "Expected cost (\$): $(μcost)")
     else
