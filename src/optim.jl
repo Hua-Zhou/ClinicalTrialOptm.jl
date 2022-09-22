@@ -114,7 +114,13 @@ function optdes!(
 end
 
 """
-    TODO
+    lbtest(ct :: ClinicalTrial, ntarget :: Integer; ps :: Real = 0.5)
+
+Tests the lower bound of the center restraints for a clinical trial `ct`.
+`ntarget` is the target patient enrollment and `ps` is the desired probability
+of success, with a default value of 0.5. The test is calculated using the normal 
+approximation of the PoS, and it outputs whether or not the optimal solution is 
+the lower bound of the centers.
 """
 function lbtest(
     ct :: ClinicalTrial,
@@ -136,7 +142,12 @@ function lbtest(
 end
 
 """
-    TODO
+ubtest(ct :: ClinicalTrial, ntarget :: Integer; ps :: Real = 0.5)
+
+Tests the upper bound of the center restraints for a clinical trial `ct`.
+`ntarget` is the target patient enrollment and `ps` is the desired probability
+of success, with a default value of 0.5. The test is calculated using the normal 
+approximation of the PoS, and it outputs whether or not a solution is feasible.
 """
 function ubtest(
     ct :: ClinicalTrial,

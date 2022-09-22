@@ -82,7 +82,7 @@ end
     cdf(ct :: ClinicalTrial, x)
 
 Cumulative distribution function of the number of patients enrolled in a
-clinical trial `ct` evaluated at x, P(X ≤ x), by applying the Gil-Pelaez inverstion formula 
+clinical trial `ct` evaluated at x, P(X ≤ x), by applying the Gil-Pelaez inversion formula 
 (<https://en.wikipedia.org/wiki/Characteristic_function_(probability_theory)#Inversion_formula>)
 to the characteristic function. 
 """
@@ -93,7 +93,10 @@ function cdf(ct :: ClinicalTrial, x :: Real)
 end
 
 """
-    TODO
+    ccdf(ct :: ClinicalTrial, x :: Real) 
+
+Complementary distribution function of the number of patients enrolled in a 
+clinical trial `ct` evaluated by 1 - `cdf(ct, x)`.
 """
 ccdf(ct :: ClinicalTrial, x :: Real) = 1 - cdf(ct, x)
 
