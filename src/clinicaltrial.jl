@@ -111,6 +111,9 @@ function Base.show(io::IO, ct::ClinicalTrial)
         μ, σ² = mean(ct), var(ct)
         println(io, "Probability of success (based on normal approximation): $(ccdf(Normal(μ, sqrt(σ²)), ct.ntarget[1]))")
         println(io, "Probability of success (based on Poisson-Gamma model): $(ccdf(ct, ct.ntarget[1]))")
+        if ccdf(ct, ct.ntarget[1]) < ccdf(Normal(μ, sqrt(σ²)), ct.ntarget[1])
+            println(io, "WARNING: Probability of success used in optimization is lower than actual. Consider adjusting it")
+        end
         μcost = mapreduce((c, x) -> mean_cost(c) * x, +, ct.countries, ct.centers)
         println(io, "Expected cost (\$): $(μcost)")
     else
