@@ -1,6 +1,6 @@
 module ClinicalTrialOptm
 
-using Cbc, Distributions, FFTW, HiGHS, QuadGK, Ipopt, JuMP, Juniper, 
+using Cbc, Distributions, FFTW, HiGHS, QuadGK, Ipopt, JuMP, Juniper,Parajito
     KNITRO, SCIP, PrettyTables, SCS
 import Statistics: mean, var
 import Distributions: ccdf, cdf
