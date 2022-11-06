@@ -110,4 +110,5 @@ end
     show(ct)
     @info "optdes! (solver = KNITRO)"
     optdes!(ct, 500, ps = 0.95, solver = "KNITRO")
+    show(ct)
 end
