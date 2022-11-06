@@ -1,7 +1,7 @@
 module ClinicalTrialOptm
 
 using Cbc, Distributions, FFTW, HiGHS, QuadGK, Ipopt, JuMP, Juniper, 
-    KNITRO, Pajarito, PrettyTables, SCS
+    KNITRO, SCIP, PrettyTables, SCS
 import Statistics: mean, var
 import Distributions: ccdf, cdf
 export ccdf, cdf, ClinicalTrial, Country, mean, mean_cost, pgf, pmf, var, optdes!
