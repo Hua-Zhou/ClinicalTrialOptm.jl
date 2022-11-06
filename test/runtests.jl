@@ -105,4 +105,9 @@ end
     @info "optdes! (pos = 0.95)"
     optdes!(ct, 500, ps = 0.95)
     show(ct)
+    @info "optdes! (solver = SCIP)"
+    optdes!(ct, 500, ps = 0.95)
+    show(ct)
+    @info "optdes! (solver = KNITRO)"
+    optdes!(ct, 500, ps = 0.95, solver = "KNITRO")
 end
