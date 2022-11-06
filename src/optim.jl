@@ -1,13 +1,17 @@
 """
-    optdes!(ct, ntarget, ps)
+    optdes!(ct, ntarget, ps, solver = SCIP)
 
 Find the optimal clinical trial design, with `ntarget` enrollment and guaranteed 
-probability of success `ps`. Overwrite `ct.centers` by the optimal solution.
+probability of success `ps`. Default `solver` is SCIP, can be changed to KNITRO by using 
+"KNITRO". Overwrite `ct.centers` by the optimal solution.
 """
 function optdes!(
     ct :: ClinicalTrial,
     ntarget :: Integer;
-    ps :: Real = 0.5
+    ps :: Real = 0.5,
+    solver = optimizer_with_attributes(
+        SCIP.Optimizer, "display/verblevel"=>0, "limits/gap"=>0.01 
+    )
     )
     # test whether the lb is optimal
     if (lbtest(ct, ntarget, ps = ps) == :lb_optimal)
@@ -65,46 +69,41 @@ function optdes!(
                 @constraint(model, σ² == sum(c_σ²[j] * x[j] for j in 1:J))
                 @constraint(model, [σ²; 0.5abs2(c_ϵ); ntarget - μ] in RotatedSecondOrderCone())
             else # c_ϵ < 0
-                # # set up Juniper solver
-                # nl_solver = optimizer_with_attributes(
-                #     Ipopt.Optimizer, 
-                #     MOI.Silent() => true, 
-                #     "sb" => "yes", 
-                #     "max_iter"   => 9999
-                # )
-                # mip_solver = optimizer_with_attributes(
-                #     HiGHS.Optimizer, 
-                #     "output_flag" => false
-                # )
-                # # mip_solver = optimizer_with_attributes(
-                # #     Cbc.Optimizer, 
-                # #     "logLevel" => 0
-                # # )
-                # minlp = optimizer_with_attributes(
-                #     Juniper.Optimizer, 
-                #     "mip_solver" => mip_solver, 
-                #     "nl_solver" => nl_solver,
-                #     # "traverse_strategy" => :DBFS,
-                #     # "processors" => 4
-                # )
-                # set up KNITRO solver
-                minlp = optimizer_with_attributes(
-                    KNITRO.Optimizer
-                )
-                # set up model
-                model = Model(minlp)
-                @variable(
-                    model, 
-                    ct.countries[j].l ≤ x[j = 1:J] ≤ ct.countries[j].u,
-                    integer = true
-                )
-                @variable(model, μ ≥ ntarget)
-                @variable(model, σ²)
-                @objective(model, Min, sum(c_f[j] * x[j] for j in 1:J))
-                @constraint(model, μ == sum(c_μ[j] * x[j] for j in 1:J))
-                @constraint(model, σ² == sum(c_σ²[j] * x[j] for j in 1:J))
-                @NLconstraint(model, abs2(c_ϵ) * σ² ≤ abs2(ntarget - μ))
-                # @NLconstraint(model, μ + c_ϵ * sqrt(σ²) ≥ ntarget)
+                if solver == "KNITRO"
+                    # set up KNITRO solver
+                    minlp = optimizer_with_attributes(
+                        KNITRO.Optimizer
+                    )
+                    # set up model
+                    model = Model(minlp)
+                    @variable(
+                        model, 
+                        ct.countries[j].l ≤ x[j = 1:J] ≤ ct.countries[j].u,
+                        integer = true
+                    )
+                    @variable(model, μ ≥ ntarget)
+                    @variable(model, σ²)
+                    @objective(model, Min, sum(c_f[j] * x[j] for j in 1:J))
+                    @constraint(model, μ == sum(c_μ[j] * x[j] for j in 1:J))
+                    @constraint(model, σ² == sum(c_σ²[j] * x[j] for j in 1:J))
+                    @NLconstraint(model, abs2(c_ϵ) * σ² ≤ abs2(ntarget - μ))
+                    # @NLconstraint(model, μ + c_ϵ * sqrt(σ²) ≥ ntarget)
+                else # solver defaults to SCIP
+                    minlp = solver
+                    model = Model(minlp)
+                    @variable(
+                        model,
+                        ct.countries[j].l ≤ x[j = 1:J] ≤ ct.countries[j].u,
+                        integer = true
+                    )
+                    @variable(model, μ ≥ ntarget)
+                    @variable(model, σ²)
+                    @objective(model, Min, sum(c_f[j] * x[j] for j in 1:J))
+                    @constraint(model, μ == sum(c_μ[j] * x[j] for j in 1:J))
+                    @constraint(model, σ² == sum(c_σ²[j] * x[j] for j in 1:J))
+                    @NLconstraint(model, (c_ϵ)^2 * σ² ≤ (ntarget - μ)^2)
+                     # @NLconstraint(model, μ + c_ϵ * sqrt(σ²) ≥ ntarget)
+                end
             end
             # solvers
             @time optimize!(model)
