@@ -1,8 +1,10 @@
 struct ClinicalTrial{T <: Real, TI <: Integer}
     countries :: Vector{Country{T}}
-    centers   :: Vector{TI} # number of centors in each country
+    centers   :: Vector{TI} # number of centers in each country
     ntarget   :: Vector{TI} # target enrollment
-    isoptm    :: Vector{Bool} 
+    isoptm   :: Vector{Bool} # solved status
+    solution_status :: Vector{String} # solution status with solver
+
 end
 
 # constructor
@@ -11,7 +13,7 @@ function ClinicalTrial(
     centers = zeros(Int, length(countries)),
     ntarget = 0
     ) where T
-    ClinicalTrial{T, Int}(countries, centers, [ntarget], [false])
+    ClinicalTrial{T, Int}(countries, centers, [ntarget], [false],["Unsolved"])
 end
 
 function ClinicalTrial(
@@ -35,7 +37,7 @@ function ClinicalTrial(
             m[i], s²[i], l[i], u[i], c₀[i], c[i], q[i], d[i], T₀[i], Td
             )
     end
-    ClinicalTrial{T, Int}(countries, centers, [ntarget], [false])
+    ClinicalTrial{T, Int}(countries, centers, [ntarget], [false], ["Unsolved"])
 end
 
 """ 
@@ -105,19 +107,20 @@ function Base.show(io::IO, ct::ClinicalTrial)
     println(io, "Global Clinical Trial:")
     println(io)
     if ct.isoptm[1]
-        println(io, "Optimal center assignment successfully found")
+        println(io, "Optimal center assignment calculated.")
+        println(io, ct.solution_status[1])
         println(io, "Total duration (months): $(ct.countries[1].Td)")
         println(io, "Target enrollment: $(ct.ntarget[1])")
         μ, σ² = mean(ct), var(ct)
         println(io, "Probability of success (based on normal approximation): $(ccdf(Normal(μ, sqrt(σ²)), ct.ntarget[1]))")
         println(io, "Probability of success (based on Poisson-Gamma model): $(ccdf(ct, ct.ntarget[1]))")
         if ccdf(ct, ct.ntarget[1]) < ccdf(Normal(μ, sqrt(σ²)), ct.ntarget[1])
-            println(io, "WARNING: Probability of success used in optimization is lower than actual. Consider adjusting it")
+            println(io, "WARNING: Probability of success used in optimization is lower than actual. Consider adjusting it.")
         end
         μcost = mapreduce((c, x) -> mean_cost(c) * x, +, ct.countries, ct.centers)
         println(io, "Expected cost (\$): $(μcost)")
     else
-        println(io, "Optimal center assignment not computed")
+        println(io, "Optimal center assignment not computed.")
     end
     J = length(ct.countries) # number of countries
     tbl = hcat(

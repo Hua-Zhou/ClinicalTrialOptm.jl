@@ -113,6 +113,11 @@ function optdes!(
             @show primal_status(model)
             @show objective_value(model)
             ct.isoptm[1] = true
+            if (termination_status(model) == OPTIMAL || termination_status(model) == LOCALLY_SOLVED)
+                ct.solution_status[1] = "An optimal solution has been found."
+            else
+                ct.solution_status[1] = "The solution is infeasible with this solver."
+            end
             ct
         end
     end
