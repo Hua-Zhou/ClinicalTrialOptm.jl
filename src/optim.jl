@@ -1,3 +1,22 @@
+oa_solver = optimizer_with_attributes(HiGHS.Optimizer,
+MOI.Silent() => true,
+"mip_feasibility_tolerance" => 1e-8,
+"mip_rel_gap" => 1e-6,
+)
+conic_solver = optimizer_with_attributes(SCS.Optimizer, 
+MOI.Silent() => true,
+)
+convex_default_solver = optimizer_with_attributes(Pajarito.Optimizer,
+    "time_limit" => 600, 
+    "oa_solver" => oa_solver, 
+    "conic_solver" => conic_solver,
+    "tol_rel_gap" => 0.001
+)
+
+nonconvex_default_solver =  optimizer_with_attributes(
+    SCIP.Optimizer, "display/verblevel"=>0, "limits/gap"=>0.001 
+)
+
 """
     optdes!(ct, ntarget, ps, solver = SCIP)
 
@@ -9,9 +28,7 @@ function optdes!(
     ct :: ClinicalTrial,
     ntarget :: Integer;
     ps :: Real = 0.5,
-    solver = optimizer_with_attributes(
-        SCIP.Optimizer, "display/verblevel"=>0, "limits/gap"=>0.01 
-    )
+    solver = ifelse(ps <= 0.5, convex_default_solver, nonconvex_default_solver)
     )
     # test whether the lb is optimal
     if (lbtest(ct, ntarget, ps = ps) == :lb_optimal)
@@ -33,30 +50,9 @@ function optdes!(
             c_σ² = [var(ct.countries[j]) for j in 1:J]
             # Φ⁻¹(ϵ)
             c_ϵ = quantile(Normal(), 1 - ps)
+            # convex case
             if c_ϵ ≥ 0
-                # # set up Pajarito solvers    
-                # oa_solver = optimizer_with_attributes(HiGHS.Optimizer,
-                #     MOI.Silent() => true,
-                #     "mip_feasibility_tolerance" => 1e-8,
-                #     "mip_rel_gap" => 1e-6,
-                # )
-                # # conic_solver = optimizer_with_attributes(Hypatia.Optimizer, 
-                # #     MOI.Silent() => true,
-                # # )
-                # conic_solver = optimizer_with_attributes(SCS.Optimizer, 
-                #     MOI.Silent() => true,
-                # )
-                # opt = optimizer_with_attributes(Pajarito.Optimizer,
-                #     "time_limit" => 600, 
-                #     "oa_solver" => oa_solver, 
-                #     "conic_solver" => conic_solver,
-                # )
-                # set up KNITRO solver
-                opt = optimizer_with_attributes(
-                    KNITRO.Optimizer
-                )
-                # set up model
-                model = Model(opt)
+                model = Model(solver)
                 @variable(
                     model, 
                     ct.countries[j].l ≤ x[j = 1:J] ≤ ct.countries[j].u,
@@ -68,42 +64,20 @@ function optdes!(
                 @constraint(model, μ == sum(c_μ[j] * x[j] for j in 1:J))
                 @constraint(model, σ² == sum(c_σ²[j] * x[j] for j in 1:J))
                 @constraint(model, [σ²; 0.5abs2(c_ϵ); ntarget - μ] in RotatedSecondOrderCone())
+            # non-convex case
             else # c_ϵ < 0
-                if solver == "KNITRO"
-                    # set up KNITRO solver
-                    minlp = optimizer_with_attributes(
-                        KNITRO.Optimizer
-                    )
-                    # set up model
-                    model = Model(minlp)
-                    @variable(
-                        model, 
-                        ct.countries[j].l ≤ x[j = 1:J] ≤ ct.countries[j].u,
-                        integer = true
-                    )
-                    @variable(model, μ ≥ ntarget)
-                    @variable(model, σ²)
-                    @objective(model, Min, sum(c_f[j] * x[j] for j in 1:J))
-                    @constraint(model, μ == sum(c_μ[j] * x[j] for j in 1:J))
-                    @constraint(model, σ² == sum(c_σ²[j] * x[j] for j in 1:J))
-                    @NLconstraint(model, abs2(c_ϵ) * σ² ≤ abs2(ntarget - μ))
-                    # @NLconstraint(model, μ + c_ϵ * sqrt(σ²) ≥ ntarget)
-                else # solver defaults to SCIP
-                    minlp = solver
-                    model = Model(minlp)
-                    @variable(
-                        model,
-                        ct.countries[j].l ≤ x[j = 1:J] ≤ ct.countries[j].u,
-                        integer = true
-                    )
-                    @variable(model, μ ≥ ntarget)
-                    @variable(model, σ²)
-                    @objective(model, Min, sum(c_f[j] * x[j] for j in 1:J))
-                    @constraint(model, μ == sum(c_μ[j] * x[j] for j in 1:J))
-                    @constraint(model, σ² == sum(c_σ²[j] * x[j] for j in 1:J))
-                    @NLconstraint(model, (c_ϵ)^2 * σ² ≤ (ntarget - μ)^2)
-                     # @NLconstraint(model, μ + c_ϵ * sqrt(σ²) ≥ ntarget)
-                end
+                model = Model(solver)
+                @variable(
+                    model,
+                    ct.countries[j].l ≤ x[j = 1:J] ≤ ct.countries[j].u,
+                    integer = true
+                )
+                @variable(model, μ ≥ ntarget)
+                @variable(model, σ²)
+                @objective(model, Min, sum(c_f[j] * x[j] for j in 1:J))
+                @constraint(model, μ == sum(c_μ[j] * x[j] for j in 1:J))
+                @constraint(model, σ² == sum(c_σ²[j] * x[j] for j in 1:J))
+                @NLconstraint(model, (c_ϵ)^2 * σ² ≤ (ntarget - μ)^2)
             end
             # solvers
             @time optimize!(model)

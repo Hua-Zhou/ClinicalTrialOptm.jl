@@ -1,5 +1,5 @@
 using ClinicalTrialOptm
-using Distributions, ForwardDiff, LinearAlgebra, Random, Test, UnicodePlots
+using Distributions, ForwardDiff, JuMP, KNITRO, LinearAlgebra, Random, Test, UnicodePlots
 
 @testset "Country" begin
     m = 1.5
@@ -99,16 +99,20 @@ end
     @show cdf(ct, 900)
     @show sum(ct_pmf[1:901])
     # optimal design
-    @info "optdes! (pos = 0.49)"
+    @info "optdes! (pos = default convex)"
     optdes!(ct, 500, ps = 0.49)
     show(ct)
-    @info "optdes! (pos = 0.95)"
+    @info "optdes! (solver = KNITRO convex)"
+    knitro_solver = optimizer_with_attributes(
+        KNITRO.Optimizer,
+        "mip_opt_gap_rel" => 0.001
+    )
+    optdes!(ct, 500, ps = 0.49, solver = knitro_solver)
+    show(ct)
+    @info "optdes! (solver = default non-convex)"
     optdes!(ct, 500, ps = 0.95)
     show(ct)
-    @info "optdes! (solver = SCIP)"
-    optdes!(ct, 500, ps = 0.95)
-    show(ct)
-    @info "optdes! (solver = KNITRO)"
-    optdes!(ct, 500, ps = 0.95, solver = "KNITRO")
+    @info "optdes! (solver = KNITRO non-convex)"
+    optdes!(ct, 500, ps = 0.95, solver = knitro_solver)
     show(ct)
 end
