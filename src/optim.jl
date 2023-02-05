@@ -21,8 +21,12 @@ nonconvex_default_solver =  optimizer_with_attributes(
     optdes!(ct :: ClinicalTrial, ntarget :: Integer, ps :: Real, solver)
 
 Find the optimal clinical trial design, with `ntarget` enrollment and guaranteed 
-probability of success `ps`. The solver can be changed to the user's preferance by setting
-`solver` equal to your solver choice. The function overwrites `ct.centers` by the optimal solution.
+probability of success `ps`. 
+
+The solver can be changed to the user's preferance by setting `solver` equal to your solver choice (see documentation page for examples). 
+The function overwrites `ct.centers` by the optimal solution.
+
+See also [`lbtest`](@ref), [`ubtest`](@ref), [`ClinicalTrial`](@ref)
 """
 function optdes!(
     ct :: ClinicalTrial,
@@ -100,11 +104,12 @@ end
 """
     lbtest(ct :: ClinicalTrial, ntarget :: Integer; ps :: Real = 0.5)
 
-Tests the lower bound of the center restraints for a clinical trial `ct`.
-`ntarget` is the target patient enrollment and `ps` is the desired probability
-of success, with a default value of 0.5. The test is calculated using the normal 
-approximation of the PoS, and it outputs whether or not the optimal solution is 
-the lower bound of the centers.
+Test the lower bound of the center restraints for a clinical trial `ct` to see if it is already the optimal solution.
+
+The test is calculated using the normal approximation of the PoS, and `ntarget` is the target patient enrollment and `ps` is the desired probability
+of success.
+
+See also [`ubtest`](@ref), [`optdes!`](@ref)
 """
 function lbtest(
     ct :: ClinicalTrial,
@@ -128,10 +133,12 @@ end
 """
 ubtest(ct :: ClinicalTrial, ntarget :: Integer; ps :: Real = 0.5)
 
-Tests the upper bound of the center restraints for a clinical trial `ct`.
-`ntarget` is the target patient enrollment and `ps` is the desired probability
-of success, with a default value of 0.5. The test is calculated using the normal 
-approximation of the PoS, and it outputs whether or not a solution is feasible.
+Test the upper bound of the center restraints for a clinical trial `ct` to see if a solution is feasible.
+
+The test is calculated using the normal approximation of the PoS, and `ntarget` is the target patient enrollment and `ps` is the desired probability
+of success.
+
+See also [`lbtest`](@ref), [`optdes!`](@ref)
 """
 function ubtest(
     ct :: ClinicalTrial,

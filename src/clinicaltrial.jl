@@ -32,23 +32,29 @@ end
         ntarget = 0
     )
 
-Stores parameters for a clinical trial. The parameters are the following:
-* `m`: expected mean enrollment rates in country
-* `s²`: variances of enrollment rates in country
-* `l`: lower bound of centers in country
-* `u`: upper bound of centers in country
-* `c₀`: cost of initializing one center in country
-* `c`: cost of running one center in country per unit of time
-* `q`: cost of one enrolled patient in country
-* `d`: probability of an enrolled patient dropping out in country
-* `T₀`: distribution of center initialization time in country
-* `Td`: duration of clinical trial 
-* `centers`: number of centers in each country for the optimal trial design. If solver has not 
-    been applied yet, then the values are set to 0. 
-* `ntarget`: target enrollment of patients
+Store parameters for a clinical trial. 
+    
+# Arguments
+- `m`: expected mean enrollment rates in country
+- `s²`: variances of enrollment rates in country
+- `l`: lower bound of centers in country
+- `u`: upper bound of centers in country
+- `c₀`: cost of initializing one center in country
+- `c`: cost of running one center in country per unit of time
+- `q`: cost of one enrolled patient in country
+- `d`: probability of an enrolled patient dropping out in country
+- `T₀`: distribution of center initialization time in country
+- `Td`: duration of clinical trial 
+- `centers`: number of centers in each country for the optimal trial design
+- `ntarget`: target enrollment of patients
 
 When inputting values, each parameter's index must corresponding with the other country values.
 Be sure to verify your values with the displayed table before applying the solver.
+
+See also: [`mean(ct :: ClinicalTrial)`](@ref), [`var(ct :: ClinicalTrial)`](@ref),
+[`pgf(ct :: ClinicalTrial, z)`](@ref), [`pmf(ct :: ClinicalTrial)`](@ref),
+[`cdf`](@ref), [`ccdf`](@ref),
+[`optdes!`](@ref)
 """
 function ClinicalTrial(
     m  :: AbstractVector{T}, # mean of Gamma-distributed enrollment rate 
@@ -77,7 +83,12 @@ end
 """ 
     mean(ct :: ClinicalTrial)
 
-Mean number of patients enrolled in a clinical trial `ct`.
+Compute the mean number of patients enrolled in a clinical trial `ct`, using the expression:
+$$
+\sum_{j=1}^J x_j m_j (1 - d_j) \left( T - \mathbb{E} T_{0j} \right).
+$$
+
+See also [`var(ct :: ClinicalTrial)`](@ref), [`pgf(ct :: ClinicalTrial, z)`](@ref)
 """
 mean(ct :: ClinicalTrial) = 
     mapreduce((c, x) -> mean(c) * x, +, ct.countries, ct.centers)
@@ -85,7 +96,14 @@ mean(ct :: ClinicalTrial) =
 """ 
     var(ct :: ClinicalTrial)
 
-Variance of the number of patients enrolled a clinical trial `ct`.
+Compute the variance of the number of patients enrolled a clinical trial `ct`, using the expression:
+$$
+\sum_{j=1}^J x_j \left[ (m_j^2 + s_j^2) 
+(1 - d_j)^2 \mathbb{{V}ar} T_{0j} + m_j (1 - d_j) \left( T - \mathbb{E} T_{0j} \right) 
++ s_j^2 (1 - d_j)^2 \left( T - \mathbb{E} T_{0j} \right)^2 \right].
+$$
+
+See also [`mean(ct :: ClinicalTrial)`](@ref), [`pgf(ct :: ClinicalTrial, z)`](@ref)
 """
 var(ct :: ClinicalTrial) = 
     mapreduce((c, x) -> var(c) * x, +, ct.countries, ct.centers)
@@ -93,8 +111,13 @@ var(ct :: ClinicalTrial) =
 """
     pgf(ct :: ClinicalTrial, z)
 
-Probability generating function of the number of patients enrolled in a
-clinical trial `ct`.
+Compute the probability generating function of the number of patients enrolled in a
+clinical trial `ct`, using the expression:
+\begin{eqnarray*}
+G(z) = \prod_{j=1}^J G_j^{x_j}(z).
+\end{eqnarray*}
+
+See also [`pmf(ct :: ClinicalTrial)`](@ref)
 """
 pgf(ct :: ClinicalTrial, z) = 
     mapreduce((c, x) -> pgf(c, z)^x, *, ct.countries, ct.centers)
@@ -102,8 +125,10 @@ pgf(ct :: ClinicalTrial, z) =
 """
     pmf(ct :: ClinicalTrial)
 
-Probability mass function of the number of patients enrolled in a
-clinical trial `ct`, by FFT of its pgf.
+Compute the probability mass function of the number of patients enrolled in a
+clinical trial `ct`, by a Fast Fourier Transform of its pgf.
+
+See also [`pgf(ct :: ClinicalTrial)`](@ref)
 """
 function pmf(ct :: ClinicalTrial)
     # support of pmf is [0, n - 1]
@@ -115,12 +140,14 @@ function pmf(ct :: ClinicalTrial)
 end
 
 """
-    cdf(ct :: ClinicalTrial, x)
+    cdf(ct :: ClinicalTrial, x :: Real)
 
-Cumulative distribution function of the number of patients enrolled in a
+Compute the cumulative distribution function of the number of patients enrolled in a
 clinical trial `ct` evaluated at x, P(X ≤ x), by applying the Gil-Pelaez inversion formula 
 (<https://en.wikipedia.org/wiki/Characteristic_function_(probability_theory)#Inversion_formula>)
 to the characteristic function. 
+
+See also [`ccdf`](@ref)
 """
 function cdf(ct :: ClinicalTrial, x :: Real)
     z = round(Int, x) == x ? x + 0.5 : Float64(x)
@@ -131,8 +158,10 @@ end
 """
     ccdf(ct :: ClinicalTrial, x :: Real) 
 
-Complementary distribution function of the number of patients enrolled in a 
+Compute the complementary distribution function of the number of patients enrolled in a 
 clinical trial `ct` evaluated by 1 - `cdf(ct, x)`.
+
+See also [`cdf`](@ref)
 """
 ccdf(ct :: ClinicalTrial, x :: Real) = 1 - cdf(ct, x)
 

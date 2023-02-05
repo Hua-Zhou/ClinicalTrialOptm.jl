@@ -11,7 +11,7 @@ struct Country{T <: Real}
     Td :: T # total duration of clinical trial
 end
 
-# constructor
+#constructor
 """ 
     Country(
         m  :: T, 
@@ -26,17 +26,23 @@ end
         Td :: T 
     )
 
-Stores parameters for a country's centers. The parameters are the following:
-* `m`: expected mean enrollment rates in country
-* `s²`: variances of enrollment rates in country
-* `l`: lower bound of centers in country
-* `u`: upper bound of centers in country
-* `c₀`: cost of initializing one center in country
-* `c`: cost of running one center in country per unit of time
-* `q`: cost of one enrolled patient in country
-* `d`: probability of an enrolled patient dropping out in country
-* `T₀`: distribution of center initialization time in country
-* `Td`: duration of clinical trial 
+Stores parameters for a country's centers.
+
+# Arguments
+- `m`: expected mean enrollment rates in country
+- `s²`: variances of enrollment rates in country
+- `l`: lower bound of centers in country
+- `u`: upper bound of centers in country
+- `c₀`: cost of initializing one center in country
+- `c`: cost of running one center in country per unit of time
+- `q`: cost of one enrolled patient in country
+- `d`: probability of an enrolled patient dropping out in country
+- `T₀`: distribution of center initialization time in country
+- `Td`: duration of clinical trial 
+
+See also [`mean(ctry :: Country)`](@ref), [`var(ctry :: Country, z)`](@ref),
+[`mean_cost(ctry :: Country)`](@ref), [`pgf(ctry :: Country, z)`](@ref),
+[`pmf(ctry :: Country)`](@ref)
 """
 function Country(
     m  :: T, # mean of Gamma-distributed enrollment rate 
@@ -56,14 +62,27 @@ end
 """ 
     mean(ctry :: Country)
 
-Mean number of patients enrolled by a center in country `ctry`.
+Calculate the mean number of patients enrolled by a center in country `ctry`, using the expression:
+$$
+x_j m_j (1 - d_j) \left( T - \mathbb{E} T_{0j} \right).
+$$
+
+See also [`var(ctry :: Country)`](@ref), [`pgf(ctry :: Country, z)`](@ref)
 """
 mean(ctry :: Country) = ctry.m * (1 - ctry.d) * (ctry.Td - mean(ctry.T₀))
 
 """ 
     var(ctry :: Country)
 
-Variance of the number of patients enrolled by a center in country `ctry`.
+Calculate the variance of the number of patients enrolled by a center in country `ctry`, 
+using the expression:
+$$
+x_j \left[ (m_j^2 + s_j^2) (1 - d_j)^2 \mathbb{{V}ar} T_{0j} + 
+m_j (1 - d_j) \left( T - \mathbb{E} T_{0j} \right) + 
+s_j^2 (1 - d_j)^2 \left( T - \mathbb{E} T_{0j} \right)^2 \right].
+
+See also [`mean(ctry :: Country)`](@ref), [`pgf(ctry :: Country, z)`](@ref)
+$$
 """
 var(ctry :: Country) = 
     (abs2(ctry.m) + ctry.s²) * abs2(1 - ctry.d) * var(ctry.T₀) + 
@@ -73,16 +92,24 @@ var(ctry :: Country) =
 """ 
     mean_cost(ctry :: Country)
 
-Mean cost of a center in country `ctry`.
+Calculate the mean cost of a center in country `ctry`, using the expression:
+$$
+x_j q_j m_j (1 - d_j) \left( T - \mathbb{E} T_{0j} \right).
+$$
 """
 mean_cost(ctry :: Country) = ctry.c₀ + 
     (ctry.c + ctry.q * ctry.m * (1 - ctry.d)) * (ctry.Td - mean(ctry.T₀))
 
 """
-    pgf(ctry, z)
+    pgf(ctry :: Country, z)
 
-Probability generating function of the number of patients enrolled by one 
-center in country `ctry`.     
+Calculate the probability generating function of the number of patients enrolled by one 
+center in country `ctry`, using the expression:
+\begin{eqnarray*}
+G_j(z) = \int \left[ 1 + \theta_j (1 - d_j) (T - t) (1 - z) \right]^{- \alpha_j} \cdot f_{T_{0j}}(t) \, dt.
+\end{eqnarray*}
+
+See also [`pmf(ctry :: Country)`](@ref)
 """
 function pgf(
     ctry :: Country{<:Real},
@@ -100,8 +127,10 @@ end
 """
     pmf(ctry :: Country)
 
-Probability mass function of the number of patients enrolled in a
-center in country `ctry`, by FFT of its pgf.
+Calculate the probability mass function of the number of patients enrolled in a
+center in country `ctry`, by Fast Fourier transform of its pgf.
+
+See also [`pgf(ctry :: Country, z)`](@ref)
 """
 function pmf(ctry :: Country)
     μ, σ² = mean(ctry), var(ctry)
