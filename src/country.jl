@@ -63,9 +63,9 @@ end
     mean(ctry :: Country)
 
 Calculate the mean number of patients enrolled by a center in country `ctry`, using the expression:
-$$
+```math
 x_j m_j (1 - d_j) \left( T - \mathbb{E} T_{0j} \right).
-$$
+```
 
 See also [`var(ctry :: Country)`](@ref), [`pgf(ctry :: Country, z)`](@ref)
 """
@@ -76,13 +76,14 @@ mean(ctry :: Country) = ctry.m * (1 - ctry.d) * (ctry.Td - mean(ctry.T₀))
 
 Calculate the variance of the number of patients enrolled by a center in country `ctry`, 
 using the expression:
-$$
+```math
 x_j \left[ (m_j^2 + s_j^2) (1 - d_j)^2 \mathbb{{V}ar} T_{0j} + 
 m_j (1 - d_j) \left( T - \mathbb{E} T_{0j} \right) + 
 s_j^2 (1 - d_j)^2 \left( T - \mathbb{E} T_{0j} \right)^2 \right].
+```
 
 See also [`mean(ctry :: Country)`](@ref), [`pgf(ctry :: Country, z)`](@ref)
-$$
+
 """
 var(ctry :: Country) = 
     (abs2(ctry.m) + ctry.s²) * abs2(1 - ctry.d) * var(ctry.T₀) + 
@@ -93,9 +94,9 @@ var(ctry :: Country) =
     mean_cost(ctry :: Country)
 
 Calculate the mean cost of a center in country `ctry`, using the expression:
-$$
+```math
 x_j q_j m_j (1 - d_j) \left( T - \mathbb{E} T_{0j} \right).
-$$
+```
 """
 mean_cost(ctry :: Country) = ctry.c₀ + 
     (ctry.c + ctry.q * ctry.m * (1 - ctry.d)) * (ctry.Td - mean(ctry.T₀))
@@ -105,9 +106,9 @@ mean_cost(ctry :: Country) = ctry.c₀ +
 
 Calculate the probability generating function of the number of patients enrolled by one 
 center in country `ctry`, using the expression:
-\begin{eqnarray*}
+```math
 G_j(z) = \int \left[ 1 + \theta_j (1 - d_j) (T - t) (1 - z) \right]^{- \alpha_j} \cdot f_{T_{0j}}(t) \, dt.
-\end{eqnarray*}
+```
 
 See also [`pmf(ctry :: Country)`](@ref)
 """

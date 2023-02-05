@@ -21,7 +21,15 @@ nonconvex_default_solver =  optimizer_with_attributes(
     optdes!(ct :: ClinicalTrial, ntarget :: Integer, ps :: Real, solver)
 
 Find the optimal clinical trial design, with `ntarget` enrollment and guaranteed 
-probability of success `ps`. 
+probability of success `ps`, using the system:
+```math
+\begin{aligned}
+&\text{minimize}& f(\xbf) \\
+&\text{subject to}& l_j \le x_j \le u_j \\
+& & \mu(\xbf) + \Phi^{-1}(\epsilon) \cdot \sigma(\xbf) - n \ge 0 \\
+& & x_j \text{ are nonnegative integers}.
+\end{aligned}
+```
 
 The solver can be changed to the user's preferance by setting `solver` equal to your solver choice (see documentation page for examples). 
 The function overwrites `ct.centers` by the optimal solution.
