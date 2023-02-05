@@ -11,6 +11,32 @@ struct Country{T <: Real}
     Td :: T # total duration of clinical trial
 end
 
+""" 
+    Country(
+        m  :: T, 
+        s² :: T, 
+        l  :: Integer, 
+        u  :: Integer,
+        c₀ :: T, 
+        c  :: T, 
+        q  :: T, 
+        d  :: T, 
+        T₀ :: Distribution{Univariate, Continuous},
+        Td :: T 
+    )
+
+Stores parameters for a country's centers. The parameters are the following:
+* `m`: expected mean enrollment rates in country
+* `s²`: variances of enrollment rates in country
+* `l`: lower bound of centers in country
+* `u`: upper bound of centers in country
+* `c₀`: cost of initializing one center in country
+* `c`: cost of running one center in country per unit of time
+* `q`: cost of one enrolled patient in country
+* `d`: probability of an enrolled patient dropping out in country
+* `T₀`: distribution of center initialization time in country
+* `Td`: duration of clinical trial 
+"""
 # constructor
 function Country(
     m  :: T, # mean of Gamma-distributed enrollment rate 
