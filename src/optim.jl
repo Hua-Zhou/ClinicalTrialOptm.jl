@@ -18,11 +18,11 @@ nonconvex_default_solver =  optimizer_with_attributes(
 )
 
 """
-    optdes!(ct, ntarget, ps, solver = SCIP)
+    optdes!(ct :: ClinicalTrial, ntarget :: Integer, ps :: Real, solver)
 
 Find the optimal clinical trial design, with `ntarget` enrollment and guaranteed 
-probability of success `ps`. Default `solver` is SCIP, can be changed to KNITRO by using 
-"KNITRO". Overwrite `ct.centers` by the optimal solution.
+probability of success `ps`. The solver can be changed to the user's preferance by setting
+`solver` equal to your solver choice. The function overwrites `ct.centers` by the optimal solution.
 """
 function optdes!(
     ct :: ClinicalTrial,
