@@ -83,12 +83,9 @@ end
 """ 
     mean(ct :: ClinicalTrial)
 
-Compute the mean number of patients enrolled in a clinical trial `ct`, using the expression:
-``
-\\sum_{j=1}^J x_j m_j (1 - d_j) \\left( T - \\mathbb{E} T_{0j} \\right).
-``
+Compute the mean number of patients enrolled in a clinical trial `ct`.
 
-See also [`var(ct :: ClinicalTrial)`](@ref), [`pgf(ct :: ClinicalTrial, z)`](@ref)
+See also [`var`](@ref), [`pgf`](@ref)
 """
 mean(ct :: ClinicalTrial) = 
     mapreduce((c, x) -> mean(c) * x, +, ct.countries, ct.centers)
@@ -96,14 +93,9 @@ mean(ct :: ClinicalTrial) =
 """ 
     var(ct :: ClinicalTrial)
 
-Compute the variance of the number of patients enrolled a clinical trial `ct`, using the expression:
-``
-\\sum_{j=1}^J x_j \\left[ (m_j^2 + s_j^2) 
-(1 - d_j)^2 \\mathbb{{V}ar} T_{0j} + m_j (1 - d_j) \\left( T - \\mathbb{E} T_{0j} \\right) 
-+ s_j^2 (1 - d_j)^2 \\left( T - \\mathbb{E} T_{0j} \\right)^2 \\right].
-``
+Compute the variance of the number of patients enrolled a clinical trial `ct`.
 
-See also [`mean(ct :: ClinicalTrial)`](@ref), [`pgf(ct :: ClinicalTrial, z)`](@ref)
+See also [`mean`](@ref), [`pgf`](@ref)
 """
 var(ct :: ClinicalTrial) = 
     mapreduce((c, x) -> var(c) * x, +, ct.countries, ct.centers)
@@ -112,12 +104,9 @@ var(ct :: ClinicalTrial) =
     pgf(ct :: ClinicalTrial, z)
 
 Compute the probability generating function of the number of patients enrolled in a
-clinical trial `ct`, using the expression:
-``
-G(z) = \\prod_{j=1}^J G_j^{x_j}(z).
-``
+clinical trial `ct`.
 
-See also [`pmf(ct :: ClinicalTrial)`](@ref)
+See also [`pmf`](@ref)
 """
 pgf(ct :: ClinicalTrial, z) = 
     mapreduce((c, x) -> pgf(c, z)^x, *, ct.countries, ct.centers)
@@ -128,7 +117,7 @@ pgf(ct :: ClinicalTrial, z) =
 Compute the probability mass function of the number of patients enrolled in a
 clinical trial `ct`, by a Fast Fourier Transform of its pgf.
 
-See also [`pgf(ct :: ClinicalTrial)`](@ref)
+See also [`pgf`](@ref)
 """
 function pmf(ct :: ClinicalTrial)
     # support of pmf is [0, n - 1]

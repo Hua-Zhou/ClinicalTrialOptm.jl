@@ -40,9 +40,9 @@ Stores parameters for a country's centers.
 - `T₀`: distribution of center initialization time in country
 - `Td`: duration of clinical trial 
 
-See also [`mean(ctry :: Country)`](@ref), [`var(ctry :: Country, z)`](@ref),
-[`mean_cost(ctry :: Country)`](@ref), [`pgf(ctry :: Country, z)`](@ref),
-[`pmf(ctry :: Country)`](@ref)
+See also [`mean`](@ref), [`var`](@ref),
+[`mean_cost`](@ref), [`pgf`](@ref),
+[`pmf`](@ref)
 """
 function Country(
     m  :: T, # mean of Gamma-distributed enrollment rate 
@@ -62,27 +62,18 @@ end
 """ 
     mean(ctry :: Country)
 
-Calculate the mean number of patients enrolled by a center in country `ctry`, using the expression:
-```math
-x_j m_j (1 - d_j) \\left( T - \\mathbb{E} T_{0j} \\right).
-```
+Calculate the mean number of patients enrolled by a center in country `ctry`.
 
-See also [`var(ctry :: Country)`](@ref), [`pgf(ctry :: Country, z)`](@ref)
+See also [`var`](@ref), [`pgf`](@ref)
 """
 mean(ctry :: Country) = ctry.m * (1 - ctry.d) * (ctry.Td - mean(ctry.T₀))
 
 """ 
     var(ctry :: Country)
 
-Calculate the variance of the number of patients enrolled by a center in country `ctry`, 
-using the expression:
-```math
-x_j \\left[ (m_j^2 + s_j^2) (1 - d_j)^2 \\mathbb{{V}ar} T_{0j} + 
-m_j (1 - d_j) \\left( T - \\mathbb{E} T_{0j} \\right) + 
-s_j^2 (1 - d_j)^2 \\left( T - \\mathbb{E} T_{0j} \\right)^2 \\right].
-```
+Calculate the variance of the number of patients enrolled by a center in country `ctry`.
 
-See also [`mean(ctry :: Country)`](@ref), [`pgf(ctry :: Country, z)`](@ref)
+See also [`mean`](@ref), [`pgf`](@ref)
 
 """
 var(ctry :: Country) = 
@@ -93,10 +84,7 @@ var(ctry :: Country) =
 """ 
     mean_cost(ctry :: Country)
 
-Calculate the mean cost of a center in country `ctry`, using the expression:
-```math
-x_j q_j m_j (1 - d_j) \\left( T - \\mathbb{E} T_{0j} \\right).
-```
+Calculate the mean cost of a center in country `ctry`, using the expression.
 """
 mean_cost(ctry :: Country) = ctry.c₀ + 
     (ctry.c + ctry.q * ctry.m * (1 - ctry.d)) * (ctry.Td - mean(ctry.T₀))
@@ -105,12 +93,9 @@ mean_cost(ctry :: Country) = ctry.c₀ +
     pgf(ctry :: Country, z)
 
 Calculate the probability generating function of the number of patients enrolled by one 
-center in country `ctry`, using the expression:
-```math
-G_j(z) = \\int \\left[ 1 + \\theta_j (1 - d_j) (T - t) (1 - z) \\right]^{- \\alpha_j} \\cdot f_{T_{0j}}(t) \\, dt.
-```
+center in country `ctry`.
 
-See also [`pmf(ctry :: Country)`](@ref)
+See also [`pmf`](@ref)
 """
 function pgf(
     ctry :: Country{<:Real},
@@ -131,7 +116,7 @@ end
 Calculate the probability mass function of the number of patients enrolled in a
 center in country `ctry`, by Fast Fourier transform of its pgf.
 
-See also [`pgf(ctry :: Country, z)`](@ref)
+See also [`pgf`](@ref)
 """
 function pmf(ctry :: Country)
     μ, σ² = mean(ctry), var(ctry)
