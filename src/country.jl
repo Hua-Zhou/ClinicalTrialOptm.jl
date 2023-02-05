@@ -11,6 +11,7 @@ struct Country{T <: Real}
     Td :: T # total duration of clinical trial
 end
 
+# constructor
 """ 
     Country(
         m  :: T, 
@@ -37,7 +38,6 @@ Stores parameters for a country's centers. The parameters are the following:
 * `T₀`: distribution of center initialization time in country
 * `Td`: duration of clinical trial 
 """
-# constructor
 function Country(
     m  :: T, # mean of Gamma-distributed enrollment rate 
     s² :: T, # var of Gamma-distributed enrollment rate 
