@@ -51,8 +51,8 @@ Store parameters for a clinical trial.
 When inputting values, each parameter's index must corresponding with the other country values.
 Be sure to verify your values with the displayed table before applying the solver.
 
-See also: [`mean(ct :: ClinicalTrial)`](@ref), [`var(ct :: ClinicalTrial)`](@ref),
-[`pgf(ct :: ClinicalTrial, z)`](@ref), [`pmf(ct :: ClinicalTrial)`](@ref),
+See also: [`mean`](@ref), [`var`](@ref),
+[`pgf`](@ref), [`pmf`](@ref),
 [`cdf`](@ref), [`ccdf`](@ref),
 [`optdes!`](@ref)
 """
