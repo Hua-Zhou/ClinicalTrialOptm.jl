@@ -85,7 +85,7 @@ end
 
 Compute the mean number of patients enrolled in a clinical trial `ct`, using the expression:
 ``
-\sum_{j=1}^J x_j m_j (1 - d_j) \left( T - \mathbb{E} T_{0j} \right).
+\\sum_{j=1}^J x_j m_j (1 - d_j) \\left( T - \\mathbb{E} T_{0j} \\right).
 ``
 
 See also [`var(ct :: ClinicalTrial)`](@ref), [`pgf(ct :: ClinicalTrial, z)`](@ref)
@@ -98,9 +98,9 @@ mean(ct :: ClinicalTrial) =
 
 Compute the variance of the number of patients enrolled a clinical trial `ct`, using the expression:
 ``
-\sum_{j=1}^J x_j \left[ (m_j^2 + s_j^2) 
-(1 - d_j)^2 \mathbb{{V}ar} T_{0j} + m_j (1 - d_j) \left( T - \mathbb{E} T_{0j} \right) 
-+ s_j^2 (1 - d_j)^2 \left( T - \mathbb{E} T_{0j} \right)^2 \right].
+\\sum_{j=1}^J x_j \\left[ (m_j^2 + s_j^2) 
+(1 - d_j)^2 \\mathbb{{V}ar} T_{0j} + m_j (1 - d_j) \\left( T - \\mathbb{E} T_{0j} \\right) 
++ s_j^2 (1 - d_j)^2 \\left( T - \\mathbb{E} T_{0j} \\right)^2 \\right].
 ``
 
 See also [`mean(ct :: ClinicalTrial)`](@ref), [`pgf(ct :: ClinicalTrial, z)`](@ref)
@@ -114,7 +114,7 @@ var(ct :: ClinicalTrial) =
 Compute the probability generating function of the number of patients enrolled in a
 clinical trial `ct`, using the expression:
 ``
-G(z) = \prod_{j=1}^J G_j^{x_j}(z).
+G(z) = \\prod_{j=1}^J G_j^{x_j}(z).
 ``
 
 See also [`pmf(ct :: ClinicalTrial)`](@ref)
