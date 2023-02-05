@@ -16,6 +16,40 @@ function ClinicalTrial(
     ClinicalTrial{T, Int}(countries, centers, [ntarget], [false],["Unsolved"])
 end
 
+""" 
+    ClinicalTrial(
+        m  :: AbstractVector{T},
+        s² :: AbstractVector{T}, 
+        l  :: AbstractVector{<:Integer}, 
+        u  :: AbstractVector{<:Integer}, 
+        c₀ :: AbstractVector{T}, 
+        c  :: AbstractVector{T}, 
+        q  :: AbstractVector{T}, 
+        d  :: AbstractVector{T}, 
+        T₀ :: AbstractVector{TD},    
+        Td :: T,
+        centers = zeros(Int, length(m)),
+        ntarget = 0
+    )
+
+Stores parameters for a clinical trial. The parameters are the following:
+* `m`: expected mean enrollment rates in country
+* `s²`: variances of enrollment rates in country
+* `l`: lower bound of centers in country
+* `u`: upper bound of centers in country
+* `c₀`: cost of initializing one center in country
+* `c`: cost of running one center in country per unit of time
+* `q`: cost of one enrolled patient in country
+* `d`: probability of an enrolled patient dropping out in country
+* `T₀`: distribution of center initialization time in country
+* `Td`: duration of clinical trial 
+* `centers`: number of centers in each country for the optimal trial design. If solver has not 
+    been applied yet, then the values are set to 0. 
+* `ntarget`: target enrollment of patients
+
+When inputting values, each parameter's index must corresponding with the other country values.
+Be sure to verify your values with the displayed table before applying the solver.
+"""
 function ClinicalTrial(
     m  :: AbstractVector{T}, # mean of Gamma-distributed enrollment rate 
     s² :: AbstractVector{T}, # var of Gamma-distributed enrollment rate 
