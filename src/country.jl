@@ -78,7 +78,7 @@ Calculate the variance of the number of patients enrolled by a center in country
 using the expression:
 ```math
 x_j \\left[ (m_j^2 + s_j^2) (1 - d_j)^2 \\mathbb{{V}ar} T_{0j} + 
-m_j (1 - d_j) \left( T - \\mathbb{E} T_{0j} \\right) + 
+m_j (1 - d_j) \\left( T - \\mathbb{E} T_{0j} \\right) + 
 s_j^2 (1 - d_j)^2 \\left( T - \\mathbb{E} T_{0j} \\right)^2 \\right].
 ```
 
