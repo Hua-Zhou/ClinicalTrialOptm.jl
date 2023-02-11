@@ -84,7 +84,7 @@ var(ctry :: Country) =
 """ 
     mean_cost(ctry :: Country)
 
-Calculate the mean cost of a center in country `ctry`, using the expression.
+Calculate the mean cost of a center in country `ctry`.
 """
 mean_cost(ctry :: Country) = ctry.c₀ + 
     (ctry.c + ctry.q * ctry.m * (1 - ctry.d)) * (ctry.Td - mean(ctry.T₀))
