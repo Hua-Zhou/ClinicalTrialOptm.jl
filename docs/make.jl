@@ -1,4 +1,6 @@
 # Inside make.jl
+using Documenter, ClinicalTrialOptm
+
 push!(LOAD_PATH,"../src/")
 using ClinicalTrialOptm
 using Documenter
