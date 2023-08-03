@@ -1,4 +1,4 @@
-# ClinicalTrialOptm
+# ClinicalTrialOptm.jl
 
 ## The Problem
 
