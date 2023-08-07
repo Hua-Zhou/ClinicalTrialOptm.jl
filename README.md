@@ -1,5 +1,10 @@
 # ClinicalTrialOptm.jl
 
+| **Documentation** | **Build Status** | **Code Coverage**  |
+|-------------------|------------------|--------------------|
+| [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://Hua-Zhou.github.io/ClinicalTrialOptm.jl/stable) [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://Hua-Zhou.github.io/ClinicalTrialOptm.jl/dev) | [![Build Status](https://travis-ci.org/Hua-Zhou/ClinicalTrialOptm.jl.svg?branch=main)](https://travis-ci.org/Hua-Zhou/ClinicalTrialOptm.jl)  | [![Coverage Status](https://coveralls.io/repos/github/Hua-Zhou/ClinicalTrialOptm.jl/badge.svg?branch=main)](https://coveralls.io/github/Hua-Zhou/ClinicalTrialOptm.jl?branch=main) [![codecov](https://codecov.io/gh/Hua-Zhou/ClinicalTrialOptm.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/Hua-Zhou/ClinicalTrialOptm.jl) |  
+
+
 ## The Problem
 
 <img alt="clinicaltrialimage" src="https://github.com/Hua-Zhou/ClinicalTrialOptm.jl/assets/110351617/bfebe101-df73-43fc-af0b-a3d41525586f">
