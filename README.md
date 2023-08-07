@@ -2,7 +2,7 @@
 
 | **Documentation** | **Build Status** | **Code Coverage**  |
 |-------------------|------------------|--------------------|
-| [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://Hua-Zhou.github.io/ClinicalTrialOptm.jl/stable) [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://Hua-Zhou.github.io/ClinicalTrialOptm.jl/dev) | [![Build Status](https://travis-ci.org/Hua-Zhou/ClinicalTrialOptm.jl.svg?branch=main)](https://travis-ci.org/Hua-Zhou/ClinicalTrialOptm.jl)  | [![Coverage Status](https://coveralls.io/repos/github/Hua-Zhou/ClinicalTrialOptm.jl/badge.svg?branch=main)](https://coveralls.io/github/Hua-Zhou/ClinicalTrialOptm.jl?branch=main) [![codecov](https://codecov.io/gh/Hua-Zhou/ClinicalTrialOptm.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/Hua-Zhou/ClinicalTrialOptm.jl) |  
+| [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://Hua-Zhou.github.io/ClinicalTrialOptm.jl/stable) [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://Hua-Zhou.github.io/ClinicalTrialOptm.jl/dev) | [![build Actions Status](https://Hua-Zhou.github.io/TrajGWAS.jl/workflows/CI/badge.svg)](https://Hua-Zhou.github.io/TrajGWAS.jl/actions)  | [![Coverage Status](https://coveralls.io/repos/github/Hua-Zhou/ClinicalTrialOptm.jl/badge.svg?branch=main)](https://coveralls.io/github/Hua-Zhou/ClinicalTrialOptm.jl?branch=main) [![codecov](https://codecov.io/gh/Hua-Zhou/ClinicalTrialOptm.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/Hua-Zhou/ClinicalTrialOptm.jl) |  
 
 
 ## The Problem
