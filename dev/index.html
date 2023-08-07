@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>ClinicalTrialOptm.jl · ClinicalTrialOptm.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">ClinicalTrialOptm.jl</span></div><form class="docs-search" action="search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li class="is-active"><a class="tocitem" href>ClinicalTrialOptm.jl</a><ul class="internal"><li><a class="tocitem" href="#Installation"><span>Installation</span></a></li><li><a class="tocitem" href="#Inputting-Parameters"><span>Inputting Parameters</span></a></li><li><a class="tocitem" href="#Using-optdes!"><span>Using optdes!</span></a></li><li><a class="tocitem" href="#Other-Functions"><span>Other Functions</span></a></li><li><a class="tocitem" href="#Example-Case"><span>Example Case</span></a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>ClinicalTrialOptm.jl</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>ClinicalTrialOptm.jl</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/Hua-Zhou/ClinicalTrialOptm.jl/blob/master/docs/src/index.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="ClinicalTrialOptm.jl"><a class="docs-heading-anchor" href="#ClinicalTrialOptm.jl">ClinicalTrialOptm.jl</a><a id="ClinicalTrialOptm.jl-1"></a><a class="docs-heading-anchor-permalink" href="#ClinicalTrialOptm.jl" title="Permalink"></a></h1><p>ClinicalTrialOptm.jl implements algorithms to solve multi-center, multi-state clinical trial recruitment problems. It considers the following parameters:</p><ul><li>Number of countries patients are recruited from, <span>$J$</span></li><li>Expected mean enrollment rates per center in each country, <span>$m_j, j = 1,...,J$</span></li><li>Variances of enrollment rates per center in each country, <span>$s^2_j, j = 1,...,J$</span></li><li>Lower bounds and upper bounds for the number of centers in each country, <span>$l_j \le x_j \le u_j, j = 1,...,J$</span></li><li>Cost of initializing one center in each country, <span>$c_0j, j = 1,...,J$</span></li><li>Cost of running one center in each country per unit of time, <span>$c_j, j = 1,...,J$</span></li><li>Cost per one enrolled patient in different countries <span>$q_j, j = 1,...,J$</span></li><li>Time a center is initialized in country <span>$j, T_0j, j = 1,...,J$</span></li><li>Duration of enrollment period, <span>$T$</span></li><li>Probability of a patient dropout in each country, <span>$d_j, j = 1,...,J$</span></li><li>The target patient enrollment, <span>$n$</span></li><li>The estimated probability of success</li></ul><p>to find the optimal number of clinics for each country, minimizing cost.</p><p>Details on the calculations are described in the paper: (Insert paper here)</p><h2 id="Installation"><a class="docs-heading-anchor" href="#Installation">Installation</a><a id="Installation-1"></a><a class="docs-heading-anchor-permalink" href="#Installation" title="Permalink"></a></h2><p>ClinicalTrialOptm.jl requires Julia v1.7 or later. The package has not been registered yet and must be isntalled using the repository location. To do so, start Julia and use the <code>]</code> key to switch to the package manager REPL:</p><pre><code class="language-">(@v1.8) Pkg&gt; add https://github.com/Hua-Zhou/ClinicalTrialOptm.jl.git</code></pre><p>Use the backspace key to return to the Julia REPL.</p><pre><code class="language-julia">versioninfo()</code></pre><pre><code class="language-none">Julia Version 1.8.1
+Commit afb6c60d69a (2022-09-06 15:09 UTC)
+Platform Info:
+  OS: macOS (arm64-apple-darwin21.5.0)
+  CPU: 8 × Apple M1
+  WORD_SIZE: 64
+  LIBM: libopenlibm
+  LLVM: libLLVM-13.0.1 (ORCJIT, apple-m1)
+  Threads: 4 on 4 virtual cores
+Environment:
+  JULIA_NUM_THREADS = 4</code></pre><pre><code class="language-julia"># for use in this tutorial
+using ClinicalTrialOptm
+using Distributions, HiGHS, SCS, Pajarito, SCIP, MathOptInterface, JuMP, Plots, StatsPlots
+const MOI = MathOptInterface;</code></pre><h2 id="Inputting-Parameters"><a class="docs-heading-anchor" href="#Inputting-Parameters">Inputting Parameters</a><a id="Inputting-Parameters-1"></a><a class="docs-heading-anchor-permalink" href="#Inputting-Parameters" title="Permalink"></a></h2><p>There are two types of data structs within this package: <code>Country</code> and <code>ClinicalTrial</code>:</p><h3 id="Country"><a class="docs-heading-anchor" href="#Country"><code>Country</code></a><a id="Country-1"></a><a class="docs-heading-anchor-permalink" href="#Country" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="ClinicalTrialOptm.Country" href="#ClinicalTrialOptm.Country"><code>ClinicalTrialOptm.Country</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">Country(
+    m  :: T, 
+    s² :: T, 
+    l  :: Integer, 
+    u  :: Integer,
+    c₀ :: T, 
+    c  :: T, 
+    q  :: T, 
+    d  :: T, 
+    T₀ :: Distribution{Univariate, Continuous},
+    Td :: T 
+)</code></pre><p>Stores parameters for a country&#39;s centers.</p><p><strong>Arguments</strong></p><ul><li><code>m</code>: expected mean enrollment rates in country</li><li><code>s²</code>: variances of enrollment rates in country</li><li><code>l</code>: lower bound of centers in country</li><li><code>u</code>: upper bound of centers in country</li><li><code>c₀</code>: cost of initializing one center in country</li><li><code>c</code>: cost of running one center in country per unit of time</li><li><code>q</code>: cost of one enrolled patient in country</li><li><code>d</code>: probability of an enrolled patient dropping out in country</li><li><code>T₀</code>: distribution of center initialization time in country</li><li><code>Td</code>: duration of clinical trial </li></ul><p>See also <a href="#Statistics.mean"><code>mean</code></a>, <a href="#Statistics.var"><code>var</code></a>, <a href="#ClinicalTrialOptm.mean_cost"><code>mean_cost</code></a>, <a href="#ClinicalTrialOptm.pgf"><code>pgf</code></a>, <a href="#ClinicalTrialOptm.pmf"><code>pmf</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Hua-Zhou/ClinicalTrialOptm.jl/blob/6acf29351731a4fd87b0e4d5df40aabe1646d982/src/country.jl#L15-L47">source</a></section></article><p>Example use:</p><pre><code class="language-julia">m = 1.5
+s² = 2.0
+l, u = 0, 10
+c₀ = 20_000.0
+c = 5_000.0
+q = 1_500.0
+d = 0.05
+T₀ = Uniform(0.0, 6.0)
+Td = 24.0
+ctry = Country(m, s², l, u, c₀, c, q, d, T₀, Td)</code></pre><pre><code class="language-none">Country{Float64}(1.5, 2.0, 0, 10, 20000.0, 5000.0, 1500.0, 0.05, Uniform{Float64}(a=0.0, b=6.0), 24.0)</code></pre><h3 id="ClinicalTrial"><a class="docs-heading-anchor" href="#ClinicalTrial"><code>ClinicalTrial</code></a><a id="ClinicalTrial-1"></a><a class="docs-heading-anchor-permalink" href="#ClinicalTrial" title="Permalink"></a></h3><pre><code class="language-">ClinicalTrial</code></pre><p>Example use:</p><pre><code class="language-julia">m = [1, 1.2, 1.4, 1.2]
+s² = [0.2, 0.4, 0.8, 0.6]
+l = [0, 3, 2, 1]
+u = [8, 5, 7, 4]
+c₀ = [15000.0, 13000.0, 16000.0, 17000.0]
+c = [3000.0, 2000.0, 5000.0, 8000.0]
+q = [1000.0, 1300.0, 900.0, 800.0]
+d = [0.01, 0.05, 0.09, 0.15]
+T₀ = fill(Uniform(0.0, 6.0), 4)
+Td = 24.0
+ct = ClinicalTrial(m, s², l, u, c₀, c, q, d, T₀, Td)</code></pre><pre><code class="language-none">Global Clinical Trial:
+
+Optimal center assignment not computed.
+┌─────────┬─────────┬────────┬────────────┬────────────────┬──────────────┬───────────────┬──────────────┬──────────────┬─────────┐
+│[1m Country [0m│[1m mean(λ) [0m│[1m var(λ) [0m│[1m init. cost [0m│[1m    maint. cost [0m│[1m enroll. cost [0m│[1m drop out rate [0m│[1m min. centers [0m│[1m max. centers [0m│[1m centers [0m│
+│[90m         [0m│[90m         [0m│[90m        [0m│[90m   $/center [0m│[90m $/center/month [0m│[90m    $/patient [0m│[90m               [0m│[90m              [0m│[90m              [0m│[90m         [0m│
+├─────────┼─────────┼────────┼────────────┼────────────────┼──────────────┼───────────────┼──────────────┼──────────────┼─────────┤
+│       1 │    1.00 │   0.20 │      15000 │           3000 │         1000 │          0.01 │            0 │            8 │      NA │
+│       2 │    1.20 │   0.40 │      13000 │           2000 │         1300 │          0.05 │            3 │            5 │      NA │
+│       3 │    1.40 │   0.80 │      16000 │           5000 │          900 │          0.09 │            2 │            7 │      NA │
+│       4 │    1.20 │   0.60 │      17000 │           8000 │          800 │          0.15 │            1 │            4 │      NA │
+└─────────┴─────────┴────────┴────────────┴────────────────┴──────────────┴───────────────┴──────────────┴──────────────┴─────────┘</code></pre><h2 id="Using-optdes!"><a class="docs-heading-anchor" href="#Using-optdes!">Using optdes!</a><a id="Using-optdes!-1"></a><a class="docs-heading-anchor-permalink" href="#Using-optdes!" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="ClinicalTrialOptm.optdes!" href="#ClinicalTrialOptm.optdes!"><code>ClinicalTrialOptm.optdes!</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">optdes!(ct :: ClinicalTrial, ntarget :: Integer, ps :: Real, solver)</code></pre><p>Find the optimal clinical trial design, with <code>ntarget</code> enrollment and guaranteed  probability of success <code>ps</code>.</p><p>The solver can be changed to the user&#39;s preferance by setting <code>solver</code> equal to your solver choice (see documentation page for examples).  The function overwrites <code>ct.centers</code> by the optimal solution.</p><p>See also <a href="@ref"><code>lbtest</code></a>, <a href="@ref"><code>ubtest</code></a>, <a href="@ref"><code>ClinicalTrial</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Hua-Zhou/ClinicalTrialOptm.jl/blob/6acf29351731a4fd87b0e4d5df40aabe1646d982/src/optim.jl#L20-L30">source</a></section></article><p>Example use:</p><pre><code class="language-julia"># input parameters
+m = [1, 1.2, 1.4, 1.2]
+s² = [0.2, 0.4, 0.8, 0.6]
+l = [0, 3, 2, 1]
+u = [8, 5, 7, 4]
+c₀ = [15000.0, 13000.0, 16000.0, 17000.0]
+c = [3000.0, 2000.0, 5000.0, 8000.0]
+q = [1000.0, 1300.0, 900.0, 800.0]
+d = [0.01, 0.05, 0.09, 0.15]
+T₀ = fill(Uniform(0.0, 6.0), 4)
+Td = 24.0
+ct = ClinicalTrial(m, s², l, u, c₀, c, q, d, T₀, Td)
+
+optdes!(ct, 400, ps = 0.85)</code></pre><pre><code class="language-none">Lower bound probability of success: 1.1138624195141726e-11
+The optimal solution is not the lower bound of the centers.
+Upper bound probability of success: 0.9878987929122786
+The optimal solution is feasible.
+  2.431819 seconds (6.81 M allocations: 366.930 MiB, 1.92% gc time, 99.24% compilation time: 24% of which was recompilation)
+solution_summary(model) = * Solver : SCIP
+
+* Status
+  Result count       : 4
+  Termination status : OPTIMAL
+  Message from the solver:
+  &quot;SCIP_STATUS_OPTIMAL&quot;
+
+* Candidate solution (result #1)
+  Primal status      : FEASIBLE_POINT
+  Dual status        : NO_SOLUTION
+  Objective value    : 2.29354e+06
+  Objective bound    : 2.29354e+06
+  Relative gap       : 0.00000e+00
+
+* Work counters
+  Solve time (sec)   : 9.47500e-03
+  Simplex iterations : 8
+  Node count         : 1
+
+termination_status(model) = MathOptInterface.OPTIMAL
+primal_status(model) = MathOptInterface.FEASIBLE_POINT
+objective_value(model) = 2.293537599999999e6
+
+
+
+
+
+
+Global Clinical Trial:
+
+Optimal center assignment calculated.
+An optimal solution has been found.
+Total duration (months): 24.0
+Target enrollment: 400
+Probability of success (based on normal approximation): 0.8587747637053408
+Probability of success (based on Poisson-Gamma model): 0.8598777881463103
+Expected cost ($): 2.2935376e6
+┌─────────┬─────────┬────────┬────────────┬────────────────┬──────────────┬───────────────┬──────────────┬──────────────┬─────────┐
+│[1m Country [0m│[1m mean(λ) [0m│[1m var(λ) [0m│[1m init. cost [0m│[1m    maint. cost [0m│[1m enroll. cost [0m│[1m drop out rate [0m│[1m min. centers [0m│[1m max. centers [0m│[1m centers [0m│
+│[90m         [0m│[90m         [0m│[90m        [0m│[90m   $/center [0m│[90m $/center/month [0m│[90m    $/patient [0m│[90m               [0m│[90m              [0m│[90m              [0m│[90m         [0m│
+├─────────┼─────────┼────────┼────────────┼────────────────┼──────────────┼───────────────┼──────────────┼──────────────┼─────────┤
+│       1 │    1.00 │   0.20 │      15000 │           3000 │         1000 │          0.01 │            0 │            8 │       8 │
+│       2 │    1.20 │   0.40 │      13000 │           2000 │         1300 │          0.05 │            3 │            5 │       5 │
+│       3 │    1.40 │   0.80 │      16000 │           5000 │          900 │          0.09 │            2 │            7 │       6 │
+│       4 │    1.20 │   0.60 │      17000 │           8000 │          800 │          0.15 │            1 │            4 │       1 │
+└─────────┴─────────┴────────┴────────────┴────────────────┴──────────────┴───────────────┴──────────────┴──────────────┴─────────┘</code></pre><p><code>optdes!</code> uses the normal approximation of the probability of success (PoS) to compute solutions, however the Poisson-Gamma model probability is displayed because it is the more accurate estimation of the PoS. If the Poisson-Gamma model PoS is less than the normal approximation PoS, then a warning will be outputted to let users know.</p><p>Example:</p><pre><code class="language-julia">optdes!(ct, 300, ps = 0.73)</code></pre><pre><code class="language-none">Lower bound probability of success: 2.57712065043568e-5
+The optimal solution is not the lower bound of the centers.
+Upper bound probability of success: 0.999879502628558
+The optimal solution is feasible.
+  0.013090 seconds (1.46 k allocations: 50.172 KiB)
+solution_summary(model) = * Solver : SCIP
+
+* Status
+  Result count       : 3
+  Termination status : OPTIMAL
+  Message from the solver:
+  &quot;SCIP_STATUS_GAPLIMIT&quot;
+
+* Candidate solution (result #1)
+  Primal status      : FEASIBLE_POINT
+  Dual status        : NO_SOLUTION
+  Objective value    : 1.61443e+06
+  Objective bound    : 1.61289e+06
+  Relative gap       : 9.59704e-04
+
+* Work counters
+  Solve time (sec)   : 6.80300e-03
+  Simplex iterations : 18
+  Node count         : 1
+
+termination_status(model) = MathOptInterface.OPTIMAL
+primal_status(model) = MathOptInterface.FEASIBLE_POINT
+objective_value(model) = 1.6144332000000002e6
+
+
+
+
+
+
+Global Clinical Trial:
+
+Optimal center assignment calculated.
+An optimal solution has been found.
+Total duration (months): 24.0
+Target enrollment: 300
+Probability of success (based on normal approximation): 0.7852131181816588
+Probability of success (based on Poisson-Gamma model): 0.7772523002943241
+WARNING: Probability of success used in optimization is lower than actual. Consider adjusting it.
+Expected cost ($): 1.6144332e6
+┌─────────┬─────────┬────────┬────────────┬────────────────┬──────────────┬───────────────┬──────────────┬──────────────┬─────────┐
+│[1m Country [0m│[1m mean(λ) [0m│[1m var(λ) [0m│[1m init. cost [0m│[1m    maint. cost [0m│[1m enroll. cost [0m│[1m drop out rate [0m│[1m min. centers [0m│[1m max. centers [0m│[1m centers [0m│
+│[90m         [0m│[90m         [0m│[90m        [0m│[90m   $/center [0m│[90m $/center/month [0m│[90m    $/patient [0m│[90m               [0m│[90m              [0m│[90m              [0m│[90m         [0m│
+├─────────┼─────────┼────────┼────────────┼────────────────┼──────────────┼───────────────┼──────────────┼──────────────┼─────────┤
+│       1 │    1.00 │   0.20 │      15000 │           3000 │         1000 │          0.01 │            0 │            8 │       7 │
+│       2 │    1.20 │   0.40 │      13000 │           2000 │         1300 │          0.05 │            3 │            5 │       5 │
+│       3 │    1.40 │   0.80 │      16000 │           5000 │          900 │          0.09 │            2 │            7 │       2 │
+│       4 │    1.20 │   0.60 │      17000 │           8000 │          800 │          0.15 │            1 │            4 │       1 │
+└─────────┴─────────┴────────┴────────────┴────────────────┴──────────────┴───────────────┴──────────────┴──────────────┴─────────┘</code></pre><h3 id="Solver-Options"><a class="docs-heading-anchor" href="#Solver-Options">Solver Options</a><a id="Solver-Options-1"></a><a class="docs-heading-anchor-permalink" href="#Solver-Options" title="Permalink"></a></h3><p><code>optdes!</code> uses Pajarito.jl to solve convex cases (when ps &lt; 0.5) and switches to SCIP.jl for non-convex cases (when ps ≥ 0.5). The exact specifications are listed below.</p><pre><code class="language-julia"># Pajarito solver
+oa_solver = optimizer_with_attributes(HiGHS.Optimizer,
+MOI.Silent() =&gt; true,
+&quot;mip_feasibility_tolerance&quot; =&gt; 1e-8,
+&quot;mip_rel_gap&quot; =&gt; 1e-6,
+)
+conic_solver = optimizer_with_attributes(SCS.Optimizer, 
+MOI.Silent() =&gt; true,
+)
+convex_default_solver = optimizer_with_attributes(Pajarito.Optimizer,
+    &quot;time_limit&quot; =&gt; 600, 
+    &quot;oa_solver&quot; =&gt; oa_solver, 
+    &quot;conic_solver&quot; =&gt; conic_solver,
+    &quot;tol_rel_gap&quot; =&gt; 0.001
+)
+
+# SCIP solver
+nonconvex_default_solver =  optimizer_with_attributes(
+    SCIP.Optimizer, &quot;display/verblevel&quot;=&gt;0, &quot;limits/gap&quot;=&gt;0.001 
+);</code></pre><p>As stated in the documentation, users can change the solver to their preference by specifying it in the <code>solver</code> argument. Here is an example using the <code>KNITRO</code> solver.</p><pre><code class="language-julia">using KNITRO 
+
+knitro_solver = optimizer_with_attributes(
+        KNITRO.Optimizer,
+        &quot;mip_opt_gap_rel&quot; =&gt; 0.001
+    )
+
+optdes!(ct, 300, ps = 0.8, solver = knitro_solver)</code></pre><pre><code class="language-none">Lower bound probability of success: 2.57712065043568e-5
+The optimal solution is not the lower bound of the centers.
+Upper bound probability of success: 0.999879502628558
+The optimal solution is feasible.
+
+=======================================
+            Student License
+       (NOT FOR COMMERCIAL USE)
+         Artelys Knitro 13.1.0
+=======================================
+
+No start point provided -- Knitro computing one.
+
+datacheck:               0
+hessian_no_f:            1
+numthreads:              1
+mip_numthreads:          1
+mip_opt_gap_rel:         0.001
+Knitro changing mip_method from AUTO to 1.
+Knitro changing mip_rootalg from AUTO to 1.
+Knitro changing mip_lpalg from AUTO to 3.
+Knitro changing mip_branchrule from AUTO to 2.
+Knitro changing mip_selectrule from AUTO to 2.
+Knitro changing mip_mir from AUTO to 1.
+Knitro changing mip_rounding from AUTO to 3.
+Knitro changing mip_heuristic_strategy from AUTO to 1.
+Knitro changing mip_heuristic_feaspump from AUTO to 1.
+Knitro changing mip_heuristic_misqp from AUTO to 0.
+Knitro changing mip_heuristic_mpec from AUTO to 1.
+Knitro changing mip_heuristic_diving from AUTO to 0.
+Knitro changing mip_heuristic_lns from AUTO to 0.
+Knitro changing mip_pseudoinit from AUTO to 1.
+
+Problem Characteristics
+-----------------------
+Objective goal:  Minimize
+Objective type:  linear
+Number of variables:                                  6
+    bounded below only:                               1
+    bounded above only:                               0
+    bounded below and above:                          4
+    fixed:                                            0
+    free:                                             1
+Number of binary variables:                           0
+Number of integer variables:                          4
+Number of constraints:                                3
+    linear equalities:                                2
+    quadratic equalities:                             0
+    gen. nonlinear equalities:                        0
+    linear one-sided inequalities:                    0
+    quadratic one-sided inequalities:                 0
+    gen. nonlinear one-sided inequalities:            1
+    linear two-sided inequalities:                    0
+    quadratic two-sided inequalities:                 0
+    gen. nonlinear two-sided inequalities:            0
+Number of nonzeros in Jacobian:                      12
+Number of nonzeros in Hessian:                        1
+
+Knitro detected 0 GUB constraints
+Knitro derived 0 knapsack covers after examining 0 constraints
+Knitro using Branch and Bound method with 1 thread.
+
+       Nodes        Best solution   Best bound      Gap       Time 
+   Expl  |  Unexpl      value         value                  (secs)
+   ---------------  -------------   ----------      ---      ------
+      0       0                           -inf                0.480
+      1       2                    1.62750e+06                0.945
+      1       2  1.91536e+06   FP  1.62750e+06     15.03%     0.947
+      8       5  1.71322e+06 LEAF  1.64687e+06      3.87%     0.949
+     12       7  1.66072e+06 LEAF  1.65461e+06      0.37%     0.950
+     15       4  1.66072e+06       1.66072e+06      0.00%     0.951
+
+EXIT: Optimal solution found (assuming convexity).
+
+HINT: The problem may be a non-convex mixed-integer problem.  Set
+      mip_multistart=1 to enable a mixed-integer multistart heuristic,
+      which may improve the chances of finding the global solution.
+
+Final Statistics for MIP
+------------------------
+Final objective value               =  1.66072180000000e+06
+Final bound value                   =  1.66072180000000e+06
+Final optimality gap (abs / rel)    =  0.00e+00 / 0.00e+00 (0.00%)
+# of nodes processed                =  15 (0.468s)
+# of strong branching evaluations   =  0 (0.000s)
+# of function evaluations           =  278 (0.000s)
+# of gradient evaluations           =  244 (0.000s)
+# of hessian evaluations            =  197 (0.463s)
+# of hessian-vector evaluations     =  0
+# of subproblems processed          =  22 (0.470s)
+Total program time (secs)           =  0.95115 (0.949 CPU time)
+Time spent in evaluations (secs)    =  0.46342
+
+Cuts statistics (computed / added)
+----------------------------------
+Knapsack cuts                       =  0 / 0
+Mixed-Integer Rounding cuts         =  0 / 0
+
+Heuristics statistics (calls / successes / time)
+------------------------------------------------
+Feasibility pump                    =  1 / 1 / 0.002s
+Rounding heuristic                  =  0 / 0 / 0.000s
+MPEC heuristic                      =  0 / 0 / 0.000s
+
+===========================================================================
+
+  1.608714 seconds (4.68 M allocations: 252.667 MiB, 2.52% gc time, 98.97% compilation time)
+solution_summary(model) = * Solver : Knitro
+
+* Status
+  Result count       : 1
+  Termination status : LOCALLY_SOLVED
+  Message from the solver:
+  &quot;0&quot;
+
+* Candidate solution (result #1)
+  Primal status      : FEASIBLE_POINT
+  Dual status        : FEASIBLE_POINT
+  Objective value    : 1.66072e+06
+  Objective bound    : 1.66072e+06
+  Relative gap       : 0.00000e+00
+
+* Work counters
+  Solve time (sec)   : 9.48609e-01
+
+termination_status(model) = MathOptInterface.LOCALLY_SOLVED
+primal_status(model) = MathOptInterface.FEASIBLE_POINT
+objective_value(model) = 1.6607218e6
+
+
+
+
+
+
+Global Clinical Trial:
+
+Optimal center assignment calculated.
+An optimal solution has been found.
+Total duration (months): 24.0
+Target enrollment: 300
+Probability of success (based on normal approximation): 0.8083143788686262
+Probability of success (based on Poisson-Gamma model): 0.8031432410861474
+WARNING: Probability of success used in optimization is lower than actual. Consider adjusting it.
+Expected cost ($): 1.6607218e6
+┌─────────┬─────────┬────────┬────────────┬────────────────┬──────────────┬───────────────┬──────────────┬──────────────┬─────────┐
+│[1m Country [0m│[1m mean(λ) [0m│[1m var(λ) [0m│[1m init. cost [0m│[1m    maint. cost [0m│[1m enroll. cost [0m│[1m drop out rate [0m│[1m min. centers [0m│[1m max. centers [0m│[1m centers [0m│
+│[90m         [0m│[90m         [0m│[90m        [0m│[90m   $/center [0m│[90m $/center/month [0m│[90m    $/patient [0m│[90m               [0m│[90m              [0m│[90m              [0m│[90m         [0m│
+├─────────┼─────────┼────────┼────────────┼────────────────┼──────────────┼───────────────┼──────────────┼──────────────┼─────────┤
+│       1 │    1.00 │   0.20 │      15000 │           3000 │         1000 │          0.01 │            0 │            8 │       6 │
+│       2 │    1.20 │   0.40 │      13000 │           2000 │         1300 │          0.05 │            3 │            5 │       5 │
+│       3 │    1.40 │   0.80 │      16000 │           5000 │          900 │          0.09 │            2 │            7 │       3 │
+│       4 │    1.20 │   0.60 │      17000 │           8000 │          800 │          0.15 │            1 │            4 │       1 │
+└─────────┴─────────┴────────┴────────────┴────────────────┴──────────────┴───────────────┴──────────────┴──────────────┴─────────┘</code></pre><h2 id="Other-Functions"><a class="docs-heading-anchor" href="#Other-Functions">Other Functions</a><a id="Other-Functions-1"></a><a class="docs-heading-anchor-permalink" href="#Other-Functions" title="Permalink"></a></h2><p>ClinicalTrialOptm.jl contains numerous other functions for patient amounts, cost, and probabilities of countries and clinical trials. </p><pre><code class="language-julia"># for example uses
+m = 1.5
+s² = 2.0
+l, u = 0, 10
+c₀ = 20_000.0
+c = 5_000.0
+q = 1_500.0
+d = 0.05
+T₀ = Uniform(0.0, 6.0)
+Td = 24.0
+ctry = Country(m, s², l, u, c₀, c, q, d, T₀, Td)
+
+m = [1, 1.2, 1.4, 1.2]
+s² = [0.2, 0.4, 0.8, 0.6]
+l = [0, 3, 2, 1]
+u = [8, 5, 7, 4]
+c₀ = [15000.0, 13000.0, 16000.0, 17000.0]
+c = [3000.0, 2000.0, 5000.0, 8000.0]
+q = [1000.0, 1300.0, 900.0, 800.0]
+d = [0.01, 0.05, 0.09, 0.15]
+T₀ = fill(Uniform(0.0, 6.0), 4)
+Td = 24.0
+centers = [2, 4, 7, 3]
+ct = ClinicalTrial(m, s², l, u, c₀, c, q, d, T₀, Td, centers);</code></pre><h3 id="mean"><a class="docs-heading-anchor" href="#mean"><code>mean</code></a><a id="mean-1"></a><a class="docs-heading-anchor-permalink" href="#mean" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="Statistics.mean" href="#Statistics.mean"><code>Statistics.mean</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">mean(itr)</code></pre><p>Compute the mean of all elements in a collection.</p><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>If <code>itr</code> contains <code>NaN</code> or <a href="@ref"><code>missing</code></a> values, the result is also <code>NaN</code> or <code>missing</code> (<code>missing</code> takes precedence if array contains both). Use the <a href="@ref"><code>skipmissing</code></a> function to omit <code>missing</code> entries and compute the mean of non-missing values.</p></div></div><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; using Statistics
+
+julia&gt; mean(1:20)
+10.5
+
+julia&gt; mean([1, missing, 3])
+missing
+
+julia&gt; mean(skipmissing([1, missing, 3]))
+2.0</code></pre></div></section><section><div><pre><code class="language-none">mean(f::Function, itr)</code></pre><p>Apply the function <code>f</code> to each element of collection <code>itr</code> and take the mean.</p><pre><code class="language-julia-repl">julia&gt; using Statistics
+
+julia&gt; mean(√, [1, 2, 3])
+1.3820881233139908
+
+julia&gt; mean([√1, √2, √3])
+1.3820881233139908</code></pre></div></section><section><div><pre><code class="language-none">mean(f::Function, A::AbstractArray; dims)</code></pre><p>Apply the function <code>f</code> to each element of array <code>A</code> and take the mean over dimensions <code>dims</code>.</p><div class="admonition is-compat"><header class="admonition-header">Julia 1.3</header><div class="admonition-body"><p>This method requires at least Julia 1.3.</p></div></div><pre><code class="language-julia-repl">julia&gt; using Statistics
+
+julia&gt; mean(√, [1, 2, 3])
+1.3820881233139908
+
+julia&gt; mean([√1, √2, √3])
+1.3820881233139908
+
+julia&gt; mean(√, [1 2 3; 4 5 6], dims=2)
+2×1 Matrix{Float64}:
+ 1.3820881233139908
+ 2.2285192400943226</code></pre></div></section><section><div><pre><code class="language-none">mean(A::AbstractArray; dims)</code></pre><p>Compute the mean of an array over the given dimensions.</p><div class="admonition is-compat"><header class="admonition-header">Julia 1.1</header><div class="admonition-body"><p><code>mean</code> for empty arrays requires at least Julia 1.1.</p></div></div><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; using Statistics
+
+julia&gt; A = [1 2; 3 4]
+2×2 Matrix{Int64}:
+ 1  2
+ 3  4
+
+julia&gt; mean(A, dims=1)
+1×2 Matrix{Float64}:
+ 2.0  3.0
+
+julia&gt; mean(A, dims=2)
+2×1 Matrix{Float64}:
+ 1.5
+ 3.5</code></pre></div></section><section><div><pre><code class="language-none">mean(A::AbstractArray, w::AbstractWeights[, dims::Int])</code></pre><p>Compute the weighted mean of array <code>A</code> with weight vector <code>w</code> (of type <code>AbstractWeights</code>). If <code>dim</code> is provided, compute the weighted mean along dimension <code>dims</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia">n = 20
+x = rand(n)
+w = rand(n)
+mean(x, weights(w))</code></pre></div></section><section><div><pre><code class="language-none">mean(d::UnivariateDistribution)</code></pre><p>Compute the expectation.</p></div></section><section><div><pre><code class="language-none">mean(d::MultivariateDistribution)</code></pre><p>Compute the mean vector of distribution <code>d</code>.</p></div></section><section><div><pre><code class="language-none">mean(d::MatrixDistribution)</code></pre><p>Return the mean matrix of <code>d</code>.</p></div></section><section><div><pre><code class="language-none">mean(d::Union{UnivariateMixture, MultivariateMixture})</code></pre><p>Compute the overall mean (expectation).</p></div></section><section><div><pre><code class="language-none">mean(ctry :: Country)</code></pre><p>Calculate the mean number of patients enrolled by a center in country <code>ctry</code>.</p><p>See also <a href="#Statistics.var"><code>var</code></a>, <a href="#ClinicalTrialOptm.pgf"><code>pgf</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Hua-Zhou/ClinicalTrialOptm.jl/blob/6acf29351731a4fd87b0e4d5df40aabe1646d982/src/country.jl#L62-L69">source</a></section><section><div><pre><code class="language-none">mean(ct :: ClinicalTrial)</code></pre><p>Compute the mean number of patients enrolled in a clinical trial <code>ct</code>.</p><p>See also <a href="#Statistics.var"><code>var</code></a>, <a href="#ClinicalTrialOptm.pgf"><code>pgf</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Hua-Zhou/ClinicalTrialOptm.jl/blob/6acf29351731a4fd87b0e4d5df40aabe1646d982/src/clinicaltrial.jl#L83-L90">source</a></section></article><p>Example uses:</p><pre><code class="language-julia">mean(ctry)</code></pre><pre><code class="language-none">29.924999999999997</code></pre><pre><code class="language-julia">mean(ct)</code></pre><pre><code class="language-none">388.878</code></pre><h3 id="var"><a class="docs-heading-anchor" href="#var"><code>var</code></a><a id="var-1"></a><a class="docs-heading-anchor-permalink" href="#var" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="Statistics.var" href="#Statistics.var"><code>Statistics.var</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">var(itr; corrected::Bool=true, mean=nothing[, dims])</code></pre><p>Compute the sample variance of collection <code>itr</code>.</p><p>The algorithm returns an estimator of the generative distribution&#39;s variance under the assumption that each entry of <code>itr</code> is a sample drawn from the same unknown distribution, with the samples uncorrelated. For arrays, this computation is equivalent to calculating <code>sum((itr .- mean(itr)).^2) / (length(itr) - 1))</code>. If <code>corrected</code> is <code>true</code>, then the sum is scaled with <code>n-1</code>, whereas the sum is scaled with <code>n</code> if <code>corrected</code> is <code>false</code> where <code>n</code> is the number of elements in <code>itr</code>.</p><p>If <code>itr</code> is an <code>AbstractArray</code>, <code>dims</code> can be provided to compute the variance over dimensions.</p><p>A pre-computed <code>mean</code> may be provided. When <code>dims</code> is specified, <code>mean</code> must be an array with the same shape as <code>mean(itr, dims=dims)</code> (additional trailing singleton dimensions are allowed).</p><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>If array contains <code>NaN</code> or <a href="@ref"><code>missing</code></a> values, the result is also <code>NaN</code> or <code>missing</code> (<code>missing</code> takes precedence if array contains both). Use the <a href="@ref"><code>skipmissing</code></a> function to omit <code>missing</code> entries and compute the variance of non-missing values.</p></div></div></div></section><section><div><pre><code class="language-none">var(x::AbstractArray, w::AbstractWeights, [dim]; mean=nothing, corrected=false)</code></pre><p>Compute the variance of a real-valued array <code>x</code>, optionally over a dimension <code>dim</code>. Observations in <code>x</code> are weighted using weight vector <code>w</code>. The uncorrected (when <code>corrected=false</code>) sample variance is defined as:</p><p class="math-container">\[\frac{1}{\sum{w}} \sum_{i=1}^n {w_i\left({x_i - μ}\right)^2 }\]</p><p>where <span>$n$</span> is the length of the input and <span>$μ$</span> is the mean. The unbiased estimate (when <code>corrected=true</code>) of the population variance is computed by replacing <span>$\frac{1}{\sum{w}}$</span> with a factor dependent on the type of weights used:</p><ul><li><code>AnalyticWeights</code>: <span>$\frac{1}{\sum w - \sum {w^2} / \sum w}$</span></li><li><code>FrequencyWeights</code>: <span>$\frac{1}{\sum{w} - 1}$</span></li><li><code>ProbabilityWeights</code>: <span>$\frac{n}{(n - 1) \sum w}$</span> where <span>$n$</span> equals <code>count(!iszero, w)</code></li><li><code>Weights</code>: <code>ArgumentError</code> (bias correction not supported)</li></ul></div></section><section><div><pre><code class="language-none">var(ce::CovarianceEstimator, x::AbstractVector; mean=nothing)</code></pre><p>Compute the variance of the vector <code>x</code> using the estimator <code>ce</code>.</p></div></section><section><div><pre><code class="language-none">var(d::UnivariateDistribution)</code></pre><p>Compute the variance. (A generic std is provided as <code>std(d) = sqrt(var(d))</code>)</p></div></section><section><div><pre><code class="language-none">var(d::MultivariateDistribution)</code></pre><p>Compute the vector of element-wise variances for distribution <code>d</code>.</p></div></section><section><div><pre><code class="language-none">var(d::MatrixDistribution)</code></pre><p>Compute the matrix of element-wise variances for distribution <code>d</code>.</p></div></section><section><div><pre><code class="language-none">var(d::UnivariateMixture)</code></pre><p>Compute the overall variance (only for <code>UnivariateMixture</code>).</p></div></section><section><div><pre><code class="language-none">var(ctry :: Country)</code></pre><p>Calculate the variance of the number of patients enrolled by a center in country <code>ctry</code>.</p><p>See also <a href="#Statistics.mean"><code>mean</code></a>, <a href="#ClinicalTrialOptm.pgf"><code>pgf</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Hua-Zhou/ClinicalTrialOptm.jl/blob/6acf29351731a4fd87b0e4d5df40aabe1646d982/src/country.jl#L71-L79">source</a></section><section><div><pre><code class="language-none">var(ct :: ClinicalTrial)</code></pre><p>Compute the variance of the number of patients enrolled a clinical trial <code>ct</code>.</p><p>See also <a href="#Statistics.mean"><code>mean</code></a>, <a href="#ClinicalTrialOptm.pgf"><code>pgf</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Hua-Zhou/ClinicalTrialOptm.jl/blob/6acf29351731a4fd87b0e4d5df40aabe1646d982/src/clinicaltrial.jl#L93-L100">source</a></section></article><p>Example uses:</p><pre><code class="language-julia">var(ctry)</code></pre><pre><code class="language-none">837.436875</code></pre><pre><code class="language-julia">var(ct)</code></pre><pre><code class="language-none">3905.413596</code></pre><h3 id="mean_cost"><a class="docs-heading-anchor" href="#mean_cost"><code>mean_cost</code></a><a id="mean_cost-1"></a><a class="docs-heading-anchor-permalink" href="#mean_cost" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="ClinicalTrialOptm.mean_cost" href="#ClinicalTrialOptm.mean_cost"><code>ClinicalTrialOptm.mean_cost</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">mean_cost(ctry :: Country)</code></pre><p>Calculate the mean cost of a center in country <code>ctry</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Hua-Zhou/ClinicalTrialOptm.jl/blob/6acf29351731a4fd87b0e4d5df40aabe1646d982/src/country.jl#L84-L89">source</a></section></article><p>Example use:</p><pre><code class="language-julia">mean_cost(ctry)</code></pre><pre><code class="language-none">169887.5</code></pre><h3 id="pgf"><a class="docs-heading-anchor" href="#pgf"><code>pgf</code></a><a id="pgf-1"></a><a class="docs-heading-anchor-permalink" href="#pgf" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="ClinicalTrialOptm.pgf" href="#ClinicalTrialOptm.pgf"><code>ClinicalTrialOptm.pgf</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">pgf(ctry :: Country, z)</code></pre><p>Calculate the probability generating function of the number of patients enrolled by one  center in country <code>ctry</code>.</p><p>See also <a href="#ClinicalTrialOptm.pmf"><code>pmf</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Hua-Zhou/ClinicalTrialOptm.jl/blob/6acf29351731a4fd87b0e4d5df40aabe1646d982/src/country.jl#L92-L99">source</a></section><section><div><pre><code class="language-none">pgf(ct :: ClinicalTrial, z)</code></pre><p>Compute the probability generating function of the number of patients enrolled in a clinical trial <code>ct</code>.</p><p>See also <a href="#ClinicalTrialOptm.pmf"><code>pmf</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Hua-Zhou/ClinicalTrialOptm.jl/blob/6acf29351731a4fd87b0e4d5df40aabe1646d982/src/clinicaltrial.jl#L103-L110">source</a></section></article><p>Example uses:</p><pre><code class="language-julia">pgf(ctry, 1.0)</code></pre><pre><code class="language-none">1.0</code></pre><pre><code class="language-julia">pgf(ct, 1.0)</code></pre><pre><code class="language-none">1.0</code></pre><h3 id="pmf"><a class="docs-heading-anchor" href="#pmf"><code>pmf</code></a><a id="pmf-1"></a><a class="docs-heading-anchor-permalink" href="#pmf" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="ClinicalTrialOptm.pmf" href="#ClinicalTrialOptm.pmf"><code>ClinicalTrialOptm.pmf</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">pmf(ctry :: Country)</code></pre><p>Calculate the probability mass function of the number of patients enrolled in a center in country <code>ctry</code>, by Fast Fourier transform of its pgf.</p><p>See also <a href="#ClinicalTrialOptm.pgf"><code>pgf</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Hua-Zhou/ClinicalTrialOptm.jl/blob/6acf29351731a4fd87b0e4d5df40aabe1646d982/src/country.jl#L113-L120">source</a></section><section><div><pre><code class="language-none">pmf(ct :: ClinicalTrial)</code></pre><p>Compute the probability mass function of the number of patients enrolled in a clinical trial <code>ct</code>, by a Fast Fourier Transform of its pgf.</p><p>See also <a href="#ClinicalTrialOptm.pgf"><code>pgf</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Hua-Zhou/ClinicalTrialOptm.jl/blob/6acf29351731a4fd87b0e4d5df40aabe1646d982/src/clinicaltrial.jl#L114-L121">source</a></section></article><p>Example uses:</p><pre><code class="language-julia">ctry_pmf = pmf(ctry)
+pltrange = 0:200
+
+x = pltrange
+y = ctry_pmf[pltrange .+ 1]
+
+plot(x, y, xlabel = &quot;Number of patients&quot;, ylabel = &quot;Probability&quot;, legend = false)</code></pre><p><img src="output_55_0.svg" alt="svg"/></p><pre><code class="language-julia">ct_pmf = pmf(ct)
+pltrange = 0:1000
+
+x = pltrange
+y = ct_pmf[pltrange .+ 1]
+
+plot(x, y, xlabel = &quot;Number of patients&quot;, ylabel = &quot;Probability&quot;, legend = false)</code></pre><p><img src="output_56_0.svg" alt="svg"/></p><h3 id="cdf"><a class="docs-heading-anchor" href="#cdf"><code>cdf</code></a><a id="cdf-1"></a><a class="docs-heading-anchor-permalink" href="#cdf" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="Distributions.cdf" href="#Distributions.cdf"><code>Distributions.cdf</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">cdf(d::UnivariateDistribution, x::Real)</code></pre><p>Evaluate the cumulative probability at <code>x</code>.</p><p>See also <a href="#Distributions.ccdf"><code>ccdf</code></a>, <a href="@ref"><code>logcdf</code></a>, and <a href="@ref"><code>logccdf</code></a>.</p></div></section><section><div><pre><code class="language-none">cdf(d::Skellam, t::Real)</code></pre><p>Implementation based on SciPy: https://github.com/scipy/scipy/blob/v0.15.1/scipy/stats/<em>discrete</em>distns.py</p><p>Refer to Eqn (5) in On an Extension of the Connexion Between Poisson and χ2 Distributions, N.L Johnson(1959) Vol 46, No 3/4, doi:10.2307/2333532 It relates the Skellam and Non-central chisquare PDFs, which is very similar to their CDFs computation as well.</p><p>Computing cdf of the Skellam distribution.</p></div></section><section><div><pre><code class="language-none">cdf(ct :: ClinicalTrial, x :: Real)</code></pre><p>Compute the cumulative distribution function of the number of patients enrolled in a clinical trial <code>ct</code> evaluated at x, P(X ≤ x), by applying the Gil-Pelaez inversion formula  (<a href="https://en.wikipedia.org/wiki/Characteristic_function_(probability_theory)#Inversion_formula">https://en.wikipedia.org/wiki/Characteristic_function_(probability_theory)#Inversion_formula</a>) to the characteristic function. </p><p>See also <a href="#Distributions.ccdf"><code>ccdf</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Hua-Zhou/ClinicalTrialOptm.jl/blob/6acf29351731a4fd87b0e4d5df40aabe1646d982/src/clinicaltrial.jl#L131-L140">source</a></section></article><p>Example use:</p><pre><code class="language-julia">x = [0:1:1000;]
+y = Vector{Float64}(undef, 1001)
+
+for n in 1:1001
+    y[n] = cdf(ct, n - 1)
+end
+
+plot(x, y, xlabel = &quot;Number of Patients&quot;, ylabel = &quot;Cumulative Probability&quot;, legend = false)</code></pre><p><img src="output_60_0.svg" alt="svg"/></p><h3 id="ccdf"><a class="docs-heading-anchor" href="#ccdf"><code>ccdf</code></a><a id="ccdf-1"></a><a class="docs-heading-anchor-permalink" href="#ccdf" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="Distributions.ccdf" href="#Distributions.ccdf"><code>Distributions.ccdf</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">ccdf(d::UnivariateDistribution, x::Real)</code></pre><p>The complementary cumulative function evaluated at <code>x</code>, i.e. <code>1 - cdf(d, x)</code>.</p></div></section><section><div><pre><code class="language-none">ccdf(ct :: ClinicalTrial, x :: Real)</code></pre><p>Compute the complementary distribution function of the number of patients enrolled in a  clinical trial <code>ct</code> evaluated by 1 - <code>cdf(ct, x)</code>.</p><p>See also <a href="#Distributions.cdf"><code>cdf</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/Hua-Zhou/ClinicalTrialOptm.jl/blob/6acf29351731a4fd87b0e4d5df40aabe1646d982/src/clinicaltrial.jl#L147-L154">source</a></section></article><p>Example use:</p><pre><code class="language-julia">x = [0:1:1000;]
+y = Vector{Float64}(undef, 1001)
+
+for n in 1:1001
+    y[n] = ccdf(ct, n - 1)
+end
+
+plot(x, y, xlabel = &quot;Number of Patients&quot;, ylabel = &quot;Complementary Cumulative Probability&quot;, 
+    legend = false)</code></pre><p><img src="output_64_0.svg" alt="svg"/></p><h2 id="Example-Case"><a class="docs-heading-anchor" href="#Example-Case">Example Case</a><a id="Example-Case-1"></a><a class="docs-heading-anchor-permalink" href="#Example-Case" title="Permalink"></a></h2><p>With individual examples shown for all functions in the package, here is an example workflow of ClinicalTrialOptm.jl using estimated parameters.</p><pre><code class="language-julia">m = [1, 1.2, 1.4, 1.9]
+s² = [1.5, 1.7, 1.3, 1.1]
+l = [0, 4, 2, 1]
+u = [10, 24, 20, 15]
+c₀ = [19000.0, 15000.0, 14000.0, 16000.0]
+c = [7000.0, 5000.0, 5000.0, 6000.0]
+q = [1000.0, 2000.0, 1500.0, 1600.0]
+d = [0.10, 0.09, 0.04, 0.07]
+T₀ = fill(Uniform(0.0, 6.0), 4)
+Td = 12.0
+ct = ClinicalTrial(m, s², l, u, c₀, c, q, d, T₀, Td)</code></pre><pre><code class="language-none">Global Clinical Trial:
+
+Optimal center assignment not computed.
+┌─────────┬─────────┬────────┬────────────┬────────────────┬──────────────┬───────────────┬──────────────┬──────────────┬─────────┐
+│[1m Country [0m│[1m mean(λ) [0m│[1m var(λ) [0m│[1m init. cost [0m│[1m    maint. cost [0m│[1m enroll. cost [0m│[1m drop out rate [0m│[1m min. centers [0m│[1m max. centers [0m│[1m centers [0m│
+│[90m         [0m│[90m         [0m│[90m        [0m│[90m   $/center [0m│[90m $/center/month [0m│[90m    $/patient [0m│[90m               [0m│[90m              [0m│[90m              [0m│[90m         [0m│
+├─────────┼─────────┼────────┼────────────┼────────────────┼──────────────┼───────────────┼──────────────┼──────────────┼─────────┤
+│       1 │    1.00 │   1.50 │      19000 │           7000 │         1000 │          0.10 │            0 │           10 │      NA │
+│       2 │    1.20 │   1.70 │      15000 │           5000 │         2000 │          0.09 │            4 │           24 │      NA │
+│       3 │    1.40 │   1.30 │      14000 │           5000 │         1500 │          0.04 │            2 │           20 │      NA │
+│       4 │    1.90 │   1.10 │      16000 │           6000 │         1600 │          0.07 │            1 │           15 │      NA │
+└─────────┴─────────┴────────┴────────────┴────────────────┴──────────────┴───────────────┴──────────────┴──────────────┴─────────┘</code></pre><p>Solving for the optimal trial design:</p><pre><code class="language-julia">optdes!(ct, 400, ps = 0.95)</code></pre><pre><code class="language-none">Lower bound probability of success: 7.112034326831168e-28
+The optimal solution is not the lower bound of the centers.
+Upper bound probability of success: 0.9999940867534107
+The optimal solution is feasible.
+  0.024632 seconds (2.13 k allocations: 55.914 KiB)
+solution_summary(model) = * Solver : SCIP
+
+* Status
+  Result count       : 7
+  Termination status : OPTIMAL
+  Message from the solver:
+  &quot;SCIP_STATUS_OPTIMAL&quot;
+
+* Candidate solution (result #1)
+  Primal status      : FEASIBLE_POINT
+  Dual status        : NO_SOLUTION
+  Objective value    : 3.27739e+06
+  Objective bound    : 3.27739e+06
+  Relative gap       : 0.00000e+00
+
+* Work counters
+  Solve time (sec)   : 1.92860e-02
+  Simplex iterations : 89
+  Node count         : 28
+
+termination_status(model) = MathOptInterface.OPTIMAL
+primal_status(model) = MathOptInterface.FEASIBLE_POINT
+objective_value(model) = 3.277387200000001e6
+
+
+
+
+
+
+Global Clinical Trial:
+
+Optimal center assignment calculated.
+An optimal solution has been found.
+Total duration (months): 12.0
+Target enrollment: 400
+Probability of success (based on normal approximation): 0.9550669693996681
+Probability of success (based on Poisson-Gamma model): 0.9636054293917478
+Expected cost ($): 3.2773872e6
+┌─────────┬─────────┬────────┬────────────┬────────────────┬──────────────┬───────────────┬──────────────┬──────────────┬─────────┐
+│[1m Country [0m│[1m mean(λ) [0m│[1m var(λ) [0m│[1m init. cost [0m│[1m    maint. cost [0m│[1m enroll. cost [0m│[1m drop out rate [0m│[1m min. centers [0m│[1m max. centers [0m│[1m centers [0m│
+│[90m         [0m│[90m         [0m│[90m        [0m│[90m   $/center [0m│[90m $/center/month [0m│[90m    $/patient [0m│[90m               [0m│[90m              [0m│[90m              [0m│[90m         [0m│
+├─────────┼─────────┼────────┼────────────┼────────────────┼──────────────┼───────────────┼──────────────┼──────────────┼─────────┤
+│       1 │    1.00 │   1.50 │      19000 │           7000 │         1000 │          0.10 │            0 │           10 │       0 │
+│       2 │    1.20 │   1.70 │      15000 │           5000 │         2000 │          0.09 │            4 │           24 │       5 │
+│       3 │    1.40 │   1.30 │      14000 │           5000 │         1500 │          0.04 │            2 │           20 │      20 │
+│       4 │    1.90 │   1.10 │      16000 │           6000 │         1600 │          0.07 │            1 │           15 │      14 │
+└─────────┴─────────┴────────┴────────────┴────────────────┴──────────────┴───────────────┴──────────────┴──────────────┴─────────┘</code></pre><p>From <code>optdes!</code>, we determine that 0 centers should be placed in country 1, 5 centers should be placed in country 2, 20 in country 3, and 14 in country 4 to minimize the trial cost and ensure a high success rate with recruitment.</p><p>Checking with <code>KNITRO</code> solver:</p><pre><code class="language-julia">using KNITRO 
+
+knitro_solver = optimizer_with_attributes(
+        KNITRO.Optimizer,
+        &quot;mip_opt_gap_rel&quot; =&gt; 0.001
+    )
+
+optdes!(ct, 400, ps = 0.95, solver = knitro_solver)</code></pre><pre><code class="language-none">Lower bound probability of success: 7.112034326831168e-28
+The optimal solution is not the lower bound of the centers.
+Upper bound probability of success: 0.9999940867534107
+The optimal solution is feasible.
+
+=======================================
+            Student License
+       (NOT FOR COMMERCIAL USE)
+         Artelys Knitro 13.1.0
+=======================================
+
+No start point provided -- Knitro computing one.
+
+datacheck:               0
+hessian_no_f:            1
+numthreads:              1
+mip_numthreads:          1
+mip_opt_gap_rel:         0.001
+Knitro changing mip_method from AUTO to 1.
+Knitro changing mip_rootalg from AUTO to 1.
+Knitro changing mip_lpalg from AUTO to 3.
+Knitro changing mip_branchrule from AUTO to 2.
+Knitro changing mip_selectrule from AUTO to 2.
+Knitro changing mip_mir from AUTO to 1.
+Knitro changing mip_rounding from AUTO to 3.
+Knitro changing mip_heuristic_strategy from AUTO to 1.
+Knitro changing mip_heuristic_feaspump from AUTO to 1.
+Knitro changing mip_heuristic_misqp from AUTO to 0.
+Knitro changing mip_heuristic_mpec from AUTO to 1.
+Knitro changing mip_heuristic_diving from AUTO to 0.
+Knitro changing mip_heuristic_lns from AUTO to 0.
+Knitro changing mip_pseudoinit from AUTO to 1.
+
+Problem Characteristics
+-----------------------
+Objective goal:  Minimize
+Objective type:  linear
+Number of variables:                                  6
+    bounded below only:                               1
+    bounded above only:                               0
+    bounded below and above:                          4
+    fixed:                                            0
+    free:                                             1
+Number of binary variables:                           0
+Number of integer variables:                          4
+Number of constraints:                                3
+    linear equalities:                                2
+    quadratic equalities:                             0
+    gen. nonlinear equalities:                        0
+    linear one-sided inequalities:                    0
+    quadratic one-sided inequalities:                 0
+    gen. nonlinear one-sided inequalities:            1
+    linear two-sided inequalities:                    0
+    quadratic two-sided inequalities:                 0
+    gen. nonlinear two-sided inequalities:            0
+Number of nonzeros in Jacobian:                      12
+Number of nonzeros in Hessian:                        1
+
+Knitro detected 0 GUB constraints
+Knitro derived 0 knapsack covers after examining 0 constraints
+Knitro using Branch and Bound method with 1 thread.
+
+       Nodes        Best solution   Best bound      Gap       Time 
+   Expl  |  Unexpl      value         value                  (secs)
+   ---------------  -------------   ----------      ---      ------
+      0       0                           -inf                0.452
+      1       2                    3.22182e+06                0.906
+      1       2  3.51328e+06   FP  3.22182e+06      8.30%     0.907
+      8       5  3.29318e+06 LEAF  3.22889e+06      1.95%     0.909
+     18      11  3.27739e+06 LEAF  3.25494e+06      0.68%     0.912
+     35       4  3.27739e+06       3.27514e+06      0.07%     0.915
+
+EXIT: Optimal solution found (assuming convexity).
+
+HINT: The problem may be a non-convex mixed-integer problem.  Set
+      mip_multistart=1 to enable a mixed-integer multistart heuristic,
+      which may improve the chances of finding the global solution.
+
+Final Statistics for MIP
+------------------------
+Final objective value               =  3.27738720000000e+06
+Final bound value                   =  3.27514400749311e+06
+Final optimality gap (abs / rel)    =  2.24e+03 / 6.84e-04 (0.07%)
+# of nodes processed                =  35 (0.460s)
+# of strong branching evaluations   =  0 (0.000s)
+# of function evaluations           =  452 (0.000s)
+# of gradient evaluations           =  431 (0.000s)
+# of hessian evaluations            =  358 (0.451s)
+# of hessian-vector evaluations     =  0
+# of subproblems processed          =  38 (0.461s)
+Total program time (secs)           =  0.91546 (0.913 CPU time)
+Time spent in evaluations (secs)    =  0.45141
+
+Cuts statistics (computed / added)
+----------------------------------
+Knapsack cuts                       =  0 / 0
+Mixed-Integer Rounding cuts         =  0 / 0
+
+Heuristics statistics (calls / successes / time)
+------------------------------------------------
+Feasibility pump                    =  1 / 1 / 0.001s
+Rounding heuristic                  =  0 / 0 / 0.000s
+MPEC heuristic                      =  0 / 0 / 0.000s
+
+===========================================================================
+
+  1.551939 seconds (4.69 M allocations: 253.220 MiB, 2.59% gc time, 98.75% compilation time)
+solution_summary(model) = * Solver : Knitro
+
+* Status
+  Result count       : 1
+  Termination status : LOCALLY_SOLVED
+  Message from the solver:
+  &quot;0&quot;
+
+* Candidate solution (result #1)
+  Primal status      : FEASIBLE_POINT
+  Dual status        : FEASIBLE_POINT
+  Objective value    : 3.27739e+06
+  Objective bound    : 3.27514e+06
+  Relative gap       : 6.84445e-04
+
+* Work counters
+  Solve time (sec)   : 9.12861e-01
+
+termination_status(model) = MathOptInterface.LOCALLY_SOLVED
+primal_status(model) = MathOptInterface.FEASIBLE_POINT
+objective_value(model) = 3.2773872e6
+
+
+
+
+
+
+Global Clinical Trial:
+
+Optimal center assignment calculated.
+An optimal solution has been found.
+Total duration (months): 12.0
+Target enrollment: 400
+Probability of success (based on normal approximation): 0.9550669693996681
+Probability of success (based on Poisson-Gamma model): 0.9636054293917478
+Expected cost ($): 3.2773872e6
+┌─────────┬─────────┬────────┬────────────┬────────────────┬──────────────┬───────────────┬──────────────┬──────────────┬─────────┐
+│[1m Country [0m│[1m mean(λ) [0m│[1m var(λ) [0m│[1m init. cost [0m│[1m    maint. cost [0m│[1m enroll. cost [0m│[1m drop out rate [0m│[1m min. centers [0m│[1m max. centers [0m│[1m centers [0m│
+│[90m         [0m│[90m         [0m│[90m        [0m│[90m   $/center [0m│[90m $/center/month [0m│[90m    $/patient [0m│[90m               [0m│[90m              [0m│[90m              [0m│[90m         [0m│
+├─────────┼─────────┼────────┼────────────┼────────────────┼──────────────┼───────────────┼──────────────┼──────────────┼─────────┤
+│       1 │    1.00 │   1.50 │      19000 │           7000 │         1000 │          0.10 │            0 │           10 │       0 │
+│       2 │    1.20 │   1.70 │      15000 │           5000 │         2000 │          0.09 │            4 │           24 │       5 │
+│       3 │    1.40 │   1.30 │      14000 │           5000 │         1500 │          0.04 │            2 │           20 │      20 │
+│       4 │    1.90 │   1.10 │      16000 │           6000 │         1600 │          0.07 │            1 │           15 │      14 │
+└─────────┴─────────┴────────┴────────────┴────────────────┴──────────────┴───────────────┴──────────────┴──────────────┴─────────┘</code></pre><p>Both solvers reach the same solution.</p><p>We can also visualize how the normal approximation of total patient recruitment compares to the more accurate Poisson-Gamma model by plotting the normal distribution, with <code>mean(ct)</code> and <code>var(ct)</code>, against <code>pmf(ct)</code>. </p><pre><code class="language-julia"># normal approximation
+μ = mean(ct)
+σ = sqrt(var(ct))
+plot(Normal(μ, σ), label = &quot;Normal Approximation&quot;)
+
+# adding the poisson-gamma model
+ct_pmf = pmf(ct)
+pltrange = 200:800
+
+x = pltrange
+y = ct_pmf[pltrange .+ 1]
+
+plot!(x, y, xlabel = &quot;Number of patients&quot;, ylabel = &quot;Probability&quot;, 
+    label = &quot;Possion-Gamma Model&quot;)</code></pre><p><img src="output_75_0.svg" alt="svg"/></p><p>From the graph, the functions are very similar, demonstrating that the normal approximation works well in calculating the patient enrollment.</p></article><nav class="docs-footer"><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 7 August 2023 04:33">Monday 7 August 2023</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
