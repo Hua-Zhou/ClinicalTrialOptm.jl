@@ -15,6 +15,7 @@ makedocs(
 deploydocs(
     repo   = "github.com/Hua-Zhou/ClinicalTrialOptm.jl.git",
     target = "build",
+    devbranch = "main",
     deps   = nothing,
     make   = nothing
 )
