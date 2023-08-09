@@ -1,23 +1,12 @@
 # ClinicalTrialOptm.jl
 
-ClinicalTrialOptm.jl implements algorithms to solve multi-center, multi-state clinical trial recruitment problems. It considers the following parameters:
-* Number of countries patients are recruited from, $J$
-* Expected mean enrollment rates per center in each country, $m_j, j = 1,...,J$
-* Variances of enrollment rates per center in each country, $s^2_j, j = 1,...,J$
-* Lower bounds and upper bounds for the number of centers in each country, $l_j \le x_j \le u_j, j = 1,...,J$
-* Cost of initializing one center in each country, $c_0j, j = 1,...,J$
-* Cost of running one center in each country per unit of time, $c_j, j = 1,...,J$
-* Cost per one enrolled patient in different countries $q_j, j = 1,...,J$
-* Time a center is initialized in country $j, T_0j, j = 1,...,J$
-* Duration of enrollment period, $T$
-* Probability of a patient dropout in each country, $d_j, j = 1,...,J$
-* The target patient enrollment, $n$
-* The estimated probability of success
+## The Problem
 
-to find the optimal number of clinics for each country, minimizing cost.
+![Screenshot%202023-07-17%20at%201.53.45%20PM.png](attachment:Screenshot%202023-07-17%20at%201.53.45%20PM.png)
 
-Details on the calculations are described in the paper:
-(Insert paper here)
+In the last five years, clinical trials have become increasingly more difficult to conduct due to staffing, budget, and protocol complications. According to the 2020 Tufts University Impact Report, more than 20% of clinical trials fail to recruit enough patients in time. Biomedical and phameceutical companies rely on trial data to progress in treatment development, making effective clinical trial design necessary to address.
+
+ClinicalTrialOptm.jl solves these multi-center, multi-state recruitment problems using mixed-integer algorithms. It seeks to optimize the number of clinics for each country, minimizing cost while maintaining high probabilities of successful recruitment. Details on the calculations are described in the paper: (Insert paper here)
 
 
 ## Installation
@@ -164,7 +153,7 @@ optdes!(ct, 400, ps = 0.85)
     The optimal solution is not the lower bound of the centers.
     Upper bound probability of success: 0.9878987929122786
     The optimal solution is feasible.
-      2.431819 seconds (6.81 M allocations: 366.930 MiB, 1.92% gc time, 99.24% compilation time: 24% of which was recompilation)
+      2.427250 seconds (6.64 M allocations: 356.902 MiB, 1.82% gc time, 99.28% compilation time: 25% of which was recompilation)
     solution_summary(model) = * Solver : SCIP
     
     * Status
@@ -181,7 +170,7 @@ optdes!(ct, 400, ps = 0.85)
       Relative gap       : 0.00000e+00
     
     * Work counters
-      Solve time (sec)   : 9.47500e-03
+      Solve time (sec)   : 8.66800e-03
       Simplex iterations : 8
       Node count         : 1
     
@@ -231,7 +220,7 @@ optdes!(ct, 300, ps = 0.73)
     The optimal solution is not the lower bound of the centers.
     Upper bound probability of success: 0.999879502628558
     The optimal solution is feasible.
-      0.013090 seconds (1.46 k allocations: 50.172 KiB)
+      0.013808 seconds (1.48 k allocations: 51.547 KiB)
     solution_summary(model) = * Solver : SCIP
     
     * Status
@@ -248,7 +237,7 @@ optdes!(ct, 300, ps = 0.73)
       Relative gap       : 9.59704e-04
     
     * Work counters
-      Solve time (sec)   : 6.80300e-03
+      Solve time (sec)   : 7.47200e-03
       Simplex iterations : 18
       Node count         : 1
     
@@ -316,176 +305,14 @@ nonconvex_default_solver =  optimizer_with_attributes(
 
 As stated in the documentation, users can change the solver to their preference by specifying it in the `solver` argument. Here is an example using the `KNITRO` solver.
 
-
-```julia
-using KNITRO 
-
+```{julia}
 knitro_solver = optimizer_with_attributes(
         KNITRO.Optimizer,
         "mip_opt_gap_rel" => 0.001
     )
-
+    
 optdes!(ct, 300, ps = 0.8, solver = knitro_solver)
 ```
-
-    Lower bound probability of success: 2.57712065043568e-5
-    The optimal solution is not the lower bound of the centers.
-    Upper bound probability of success: 0.999879502628558
-    The optimal solution is feasible.
-    
-    =======================================
-                Student License
-           (NOT FOR COMMERCIAL USE)
-             Artelys Knitro 13.1.0
-    =======================================
-    
-    No start point provided -- Knitro computing one.
-    
-    datacheck:               0
-    hessian_no_f:            1
-    numthreads:              1
-    mip_numthreads:          1
-    mip_opt_gap_rel:         0.001
-    Knitro changing mip_method from AUTO to 1.
-    Knitro changing mip_rootalg from AUTO to 1.
-    Knitro changing mip_lpalg from AUTO to 3.
-    Knitro changing mip_branchrule from AUTO to 2.
-    Knitro changing mip_selectrule from AUTO to 2.
-    Knitro changing mip_mir from AUTO to 1.
-    Knitro changing mip_rounding from AUTO to 3.
-    Knitro changing mip_heuristic_strategy from AUTO to 1.
-    Knitro changing mip_heuristic_feaspump from AUTO to 1.
-    Knitro changing mip_heuristic_misqp from AUTO to 0.
-    Knitro changing mip_heuristic_mpec from AUTO to 1.
-    Knitro changing mip_heuristic_diving from AUTO to 0.
-    Knitro changing mip_heuristic_lns from AUTO to 0.
-    Knitro changing mip_pseudoinit from AUTO to 1.
-    
-    Problem Characteristics
-    -----------------------
-    Objective goal:  Minimize
-    Objective type:  linear
-    Number of variables:                                  6
-        bounded below only:                               1
-        bounded above only:                               0
-        bounded below and above:                          4
-        fixed:                                            0
-        free:                                             1
-    Number of binary variables:                           0
-    Number of integer variables:                          4
-    Number of constraints:                                3
-        linear equalities:                                2
-        quadratic equalities:                             0
-        gen. nonlinear equalities:                        0
-        linear one-sided inequalities:                    0
-        quadratic one-sided inequalities:                 0
-        gen. nonlinear one-sided inequalities:            1
-        linear two-sided inequalities:                    0
-        quadratic two-sided inequalities:                 0
-        gen. nonlinear two-sided inequalities:            0
-    Number of nonzeros in Jacobian:                      12
-    Number of nonzeros in Hessian:                        1
-    
-    Knitro detected 0 GUB constraints
-    Knitro derived 0 knapsack covers after examining 0 constraints
-    Knitro using Branch and Bound method with 1 thread.
-    
-           Nodes        Best solution   Best bound      Gap       Time 
-       Expl  |  Unexpl      value         value                  (secs)
-       ---------------  -------------   ----------      ---      ------
-          0       0                           -inf                0.480
-          1       2                    1.62750e+06                0.945
-          1       2  1.91536e+06   FP  1.62750e+06     15.03%     0.947
-          8       5  1.71322e+06 LEAF  1.64687e+06      3.87%     0.949
-         12       7  1.66072e+06 LEAF  1.65461e+06      0.37%     0.950
-         15       4  1.66072e+06       1.66072e+06      0.00%     0.951
-    
-    EXIT: Optimal solution found (assuming convexity).
-    
-    HINT: The problem may be a non-convex mixed-integer problem.  Set
-          mip_multistart=1 to enable a mixed-integer multistart heuristic,
-          which may improve the chances of finding the global solution.
-    
-    Final Statistics for MIP
-    ------------------------
-    Final objective value               =  1.66072180000000e+06
-    Final bound value                   =  1.66072180000000e+06
-    Final optimality gap (abs / rel)    =  0.00e+00 / 0.00e+00 (0.00%)
-    # of nodes processed                =  15 (0.468s)
-    # of strong branching evaluations   =  0 (0.000s)
-    # of function evaluations           =  278 (0.000s)
-    # of gradient evaluations           =  244 (0.000s)
-    # of hessian evaluations            =  197 (0.463s)
-    # of hessian-vector evaluations     =  0
-    # of subproblems processed          =  22 (0.470s)
-    Total program time (secs)           =  0.95115 (0.949 CPU time)
-    Time spent in evaluations (secs)    =  0.46342
-    
-    Cuts statistics (computed / added)
-    ----------------------------------
-    Knapsack cuts                       =  0 / 0
-    Mixed-Integer Rounding cuts         =  0 / 0
-    
-    Heuristics statistics (calls / successes / time)
-    ------------------------------------------------
-    Feasibility pump                    =  1 / 1 / 0.002s
-    Rounding heuristic                  =  0 / 0 / 0.000s
-    MPEC heuristic                      =  0 / 0 / 0.000s
-    
-    ===========================================================================
-    
-      1.608714 seconds (4.68 M allocations: 252.667 MiB, 2.52% gc time, 98.97% compilation time)
-    solution_summary(model) = * Solver : Knitro
-    
-    * Status
-      Result count       : 1
-      Termination status : LOCALLY_SOLVED
-      Message from the solver:
-      "0"
-    
-    * Candidate solution (result #1)
-      Primal status      : FEASIBLE_POINT
-      Dual status        : FEASIBLE_POINT
-      Objective value    : 1.66072e+06
-      Objective bound    : 1.66072e+06
-      Relative gap       : 0.00000e+00
-    
-    * Work counters
-      Solve time (sec)   : 9.48609e-01
-    
-    termination_status(model) = MathOptInterface.LOCALLY_SOLVED
-    primal_status(model) = MathOptInterface.FEASIBLE_POINT
-    objective_value(model) = 1.6607218e6
-
-
-
-
-
-    
-    Global Clinical Trial:
-    
-    Optimal center assignment calculated.
-    An optimal solution has been found.
-    Total duration (months): 24.0
-    Target enrollment: 300
-    Probability of success (based on normal approximation): 0.8083143788686262
-    Probability of success (based on Poisson-Gamma model): 0.8031432410861474
-    WARNING: Probability of success used in optimization is lower than actual. Consider adjusting it.
-    Expected cost ($): 1.6607218e6
-    ┌─────────┬─────────┬────────┬────────────┬────────────────┬──────────────┬───────────────┬──────────────┬──────────────┬─────────┐
-    │[1m Country [0m│[1m mean(λ) [0m│[1m var(λ) [0m│[1m init. cost [0m│[1m    maint. cost [0m│[1m enroll. cost [0m│[1m drop out rate [0m│[1m min. centers [0m│[1m max. centers [0m│[1m centers [0m│
-    │[90m         [0m│[90m         [0m│[90m        [0m│[90m   $/center [0m│[90m $/center/month [0m│[90m    $/patient [0m│[90m               [0m│[90m              [0m│[90m              [0m│[90m         [0m│
-    ├─────────┼─────────┼────────┼────────────┼────────────────┼──────────────┼───────────────┼──────────────┼──────────────┼─────────┤
-    │       1 │    1.00 │   0.20 │      15000 │           3000 │         1000 │          0.01 │            0 │            8 │       6 │
-    │       2 │    1.20 │   0.40 │      13000 │           2000 │         1300 │          0.05 │            3 │            5 │       5 │
-    │       3 │    1.40 │   0.80 │      16000 │           5000 │          900 │          0.09 │            2 │            7 │       3 │
-    │       4 │    1.20 │   0.60 │      17000 │           8000 │          800 │          0.15 │            1 │            4 │       1 │
-    └─────────┴─────────┴────────┴────────────┴────────────────┴──────────────┴───────────────┴──────────────┴──────────────┴─────────┘
-    
-    
-
-
-
 
 ## Other Functions
 
@@ -794,7 +621,7 @@ optdes!(ct, 400, ps = 0.95)
     The optimal solution is not the lower bound of the centers.
     Upper bound probability of success: 0.9999940867534107
     The optimal solution is feasible.
-      0.024632 seconds (2.13 k allocations: 55.914 KiB)
+      0.026162 seconds (2.16 k allocations: 57.289 KiB)
     solution_summary(model) = * Solver : SCIP
     
     * Status
@@ -811,7 +638,7 @@ optdes!(ct, 400, ps = 0.95)
       Relative gap       : 0.00000e+00
     
     * Work counters
-      Solve time (sec)   : 1.92860e-02
+      Solve time (sec)   : 2.14900e-02
       Simplex iterations : 89
       Node count         : 28
     
@@ -850,180 +677,6 @@ optdes!(ct, 400, ps = 0.95)
 
 From `optdes!`, we determine that 0 centers should be placed in country 1, 5 centers should be placed in country 2, 20 in country 3, and 14 in country 4 to minimize the trial cost and ensure a high success rate with recruitment.
 
-Checking with `KNITRO` solver:
-
-
-```julia
-using KNITRO 
-
-knitro_solver = optimizer_with_attributes(
-        KNITRO.Optimizer,
-        "mip_opt_gap_rel" => 0.001
-    )
-
-optdes!(ct, 400, ps = 0.95, solver = knitro_solver)
-```
-
-    Lower bound probability of success: 7.112034326831168e-28
-    The optimal solution is not the lower bound of the centers.
-    Upper bound probability of success: 0.9999940867534107
-    The optimal solution is feasible.
-    
-    =======================================
-                Student License
-           (NOT FOR COMMERCIAL USE)
-             Artelys Knitro 13.1.0
-    =======================================
-    
-    No start point provided -- Knitro computing one.
-    
-    datacheck:               0
-    hessian_no_f:            1
-    numthreads:              1
-    mip_numthreads:          1
-    mip_opt_gap_rel:         0.001
-    Knitro changing mip_method from AUTO to 1.
-    Knitro changing mip_rootalg from AUTO to 1.
-    Knitro changing mip_lpalg from AUTO to 3.
-    Knitro changing mip_branchrule from AUTO to 2.
-    Knitro changing mip_selectrule from AUTO to 2.
-    Knitro changing mip_mir from AUTO to 1.
-    Knitro changing mip_rounding from AUTO to 3.
-    Knitro changing mip_heuristic_strategy from AUTO to 1.
-    Knitro changing mip_heuristic_feaspump from AUTO to 1.
-    Knitro changing mip_heuristic_misqp from AUTO to 0.
-    Knitro changing mip_heuristic_mpec from AUTO to 1.
-    Knitro changing mip_heuristic_diving from AUTO to 0.
-    Knitro changing mip_heuristic_lns from AUTO to 0.
-    Knitro changing mip_pseudoinit from AUTO to 1.
-    
-    Problem Characteristics
-    -----------------------
-    Objective goal:  Minimize
-    Objective type:  linear
-    Number of variables:                                  6
-        bounded below only:                               1
-        bounded above only:                               0
-        bounded below and above:                          4
-        fixed:                                            0
-        free:                                             1
-    Number of binary variables:                           0
-    Number of integer variables:                          4
-    Number of constraints:                                3
-        linear equalities:                                2
-        quadratic equalities:                             0
-        gen. nonlinear equalities:                        0
-        linear one-sided inequalities:                    0
-        quadratic one-sided inequalities:                 0
-        gen. nonlinear one-sided inequalities:            1
-        linear two-sided inequalities:                    0
-        quadratic two-sided inequalities:                 0
-        gen. nonlinear two-sided inequalities:            0
-    Number of nonzeros in Jacobian:                      12
-    Number of nonzeros in Hessian:                        1
-    
-    Knitro detected 0 GUB constraints
-    Knitro derived 0 knapsack covers after examining 0 constraints
-    Knitro using Branch and Bound method with 1 thread.
-    
-           Nodes        Best solution   Best bound      Gap       Time 
-       Expl  |  Unexpl      value         value                  (secs)
-       ---------------  -------------   ----------      ---      ------
-          0       0                           -inf                0.452
-          1       2                    3.22182e+06                0.906
-          1       2  3.51328e+06   FP  3.22182e+06      8.30%     0.907
-          8       5  3.29318e+06 LEAF  3.22889e+06      1.95%     0.909
-         18      11  3.27739e+06 LEAF  3.25494e+06      0.68%     0.912
-         35       4  3.27739e+06       3.27514e+06      0.07%     0.915
-    
-    EXIT: Optimal solution found (assuming convexity).
-    
-    HINT: The problem may be a non-convex mixed-integer problem.  Set
-          mip_multistart=1 to enable a mixed-integer multistart heuristic,
-          which may improve the chances of finding the global solution.
-    
-    Final Statistics for MIP
-    ------------------------
-    Final objective value               =  3.27738720000000e+06
-    Final bound value                   =  3.27514400749311e+06
-    Final optimality gap (abs / rel)    =  2.24e+03 / 6.84e-04 (0.07%)
-    # of nodes processed                =  35 (0.460s)
-    # of strong branching evaluations   =  0 (0.000s)
-    # of function evaluations           =  452 (0.000s)
-    # of gradient evaluations           =  431 (0.000s)
-    # of hessian evaluations            =  358 (0.451s)
-    # of hessian-vector evaluations     =  0
-    # of subproblems processed          =  38 (0.461s)
-    Total program time (secs)           =  0.91546 (0.913 CPU time)
-    Time spent in evaluations (secs)    =  0.45141
-    
-    Cuts statistics (computed / added)
-    ----------------------------------
-    Knapsack cuts                       =  0 / 0
-    Mixed-Integer Rounding cuts         =  0 / 0
-    
-    Heuristics statistics (calls / successes / time)
-    ------------------------------------------------
-    Feasibility pump                    =  1 / 1 / 0.001s
-    Rounding heuristic                  =  0 / 0 / 0.000s
-    MPEC heuristic                      =  0 / 0 / 0.000s
-    
-    ===========================================================================
-    
-      1.551939 seconds (4.69 M allocations: 253.220 MiB, 2.59% gc time, 98.75% compilation time)
-    solution_summary(model) = * Solver : Knitro
-    
-    * Status
-      Result count       : 1
-      Termination status : LOCALLY_SOLVED
-      Message from the solver:
-      "0"
-    
-    * Candidate solution (result #1)
-      Primal status      : FEASIBLE_POINT
-      Dual status        : FEASIBLE_POINT
-      Objective value    : 3.27739e+06
-      Objective bound    : 3.27514e+06
-      Relative gap       : 6.84445e-04
-    
-    * Work counters
-      Solve time (sec)   : 9.12861e-01
-    
-    termination_status(model) = MathOptInterface.LOCALLY_SOLVED
-    primal_status(model) = MathOptInterface.FEASIBLE_POINT
-    objective_value(model) = 3.2773872e6
-
-
-
-
-
-    
-    Global Clinical Trial:
-    
-    Optimal center assignment calculated.
-    An optimal solution has been found.
-    Total duration (months): 12.0
-    Target enrollment: 400
-    Probability of success (based on normal approximation): 0.9550669693996681
-    Probability of success (based on Poisson-Gamma model): 0.9636054293917478
-    Expected cost ($): 3.2773872e6
-    ┌─────────┬─────────┬────────┬────────────┬────────────────┬──────────────┬───────────────┬──────────────┬──────────────┬─────────┐
-    │[1m Country [0m│[1m mean(λ) [0m│[1m var(λ) [0m│[1m init. cost [0m│[1m    maint. cost [0m│[1m enroll. cost [0m│[1m drop out rate [0m│[1m min. centers [0m│[1m max. centers [0m│[1m centers [0m│
-    │[90m         [0m│[90m         [0m│[90m        [0m│[90m   $/center [0m│[90m $/center/month [0m│[90m    $/patient [0m│[90m               [0m│[90m              [0m│[90m              [0m│[90m         [0m│
-    ├─────────┼─────────┼────────┼────────────┼────────────────┼──────────────┼───────────────┼──────────────┼──────────────┼─────────┤
-    │       1 │    1.00 │   1.50 │      19000 │           7000 │         1000 │          0.10 │            0 │           10 │       0 │
-    │       2 │    1.20 │   1.70 │      15000 │           5000 │         2000 │          0.09 │            4 │           24 │       5 │
-    │       3 │    1.40 │   1.30 │      14000 │           5000 │         1500 │          0.04 │            2 │           20 │      20 │
-    │       4 │    1.90 │   1.10 │      16000 │           6000 │         1600 │          0.07 │            1 │           15 │      14 │
-    └─────────┴─────────┴────────┴────────────┴────────────────┴──────────────┴───────────────┴──────────────┴──────────────┴─────────┘
-    
-    
-
-
-
-
-Both solvers reach the same solution.
-
 We can also visualize how the normal approximation of total patient recruitment compares to the more accurate Poisson-Gamma model by plotting the normal distribution, with `mean(ct)` and `var(ct)`, against `pmf(ct)`. 
 
 
@@ -1048,7 +701,7 @@ plot!(x, y, xlabel = "Number of patients", ylabel = "Probability",
 
 
     
-![svg](output_75_0.svg)
+![svg](output_72_0.svg)
     
 
 
