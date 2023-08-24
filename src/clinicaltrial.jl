@@ -4,18 +4,9 @@ struct ClinicalTrial{T <: Real, TI <: Integer}
     ntarget   :: Vector{TI} # target enrollment
     isoptm   :: Vector{Bool} # solved status
     solution_status :: Vector{String} # solution status with solver
-
 end
 
 # constructor
-function ClinicalTrial(
-    countries :: Vector{Country{T}}, 
-    centers = zeros(Int, length(countries)),
-    ntarget = 0
-    ) where T
-    ClinicalTrial{T, Int}(countries, centers, [ntarget], [false],["Unsolved"])
-end
-
 """ 
     ClinicalTrial(
         m  :: AbstractVector{T},
@@ -56,6 +47,14 @@ See also: [`mean`](@ref), [`var`](@ref),
 [`cdf`](@ref), [`ccdf`](@ref),
 [`optdes!`](@ref)
 """
+function ClinicalTrial(
+    countries :: Vector{Country{T}}, 
+    centers = zeros(Int, length(countries)),
+    ntarget = 0
+    ) where T
+    ClinicalTrial{T, Int}(countries, centers, [ntarget], [false],["Unsolved"])
+end
+
 function ClinicalTrial(
     m  :: AbstractVector{T}, # mean of Gamma-distributed enrollment rate 
     s² :: AbstractVector{T}, # var of Gamma-distributed enrollment rate 
