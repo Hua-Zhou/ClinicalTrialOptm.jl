@@ -2,15 +2,13 @@
 
 ## The Problem
 
-![clinicaltrialimage.png](attachment:clinicaltrialimage.png)
-
 In the last five years, clinical trials have become increasingly more difficult to conduct due to staffing, budget, and protocol complications. According to the 2020 Tufts University Impact Report, more than 20% of clinical trials fail to recruit enough patients in time. Biomedical and phameceutical companies rely on trial data to progress in treatment development, making effective clinical trial design necessary to address.
 
-ClinicalTrialOptm.jl solves these multi-center, multi-state recruitment problems using mixed-integer algorithms. It seeks to optimize the number of clinics for each country, minimizing cost while maintaining high probabilities of successful recruitment. Details on the calculations are described in the paper: (Insert paper here)
+ClinicalTrialOptm.jl solves these multi-center, multi-state recruitment problems using mixed-integer algorithms. It seeks to optimize the number of clinics for each country, minimizing cost while maintaining high probabilities of successful recruitment. Details on the calculations are described in the paper: (paper not finished yet)
 
 ## Installation
 
-ClinicalTrialOptm.jl requires Julia v1.7 or later. The package has not been registered yet and must be isntalled using the repository location. To do so, start Julia and use the `]` key to switch to the package manager REPL:
+ClinicalTrialOptm.jl requires Julia v1.7 or later. The package has not been registered yet and must be installed using the repository location. To do so, start Julia and use the `]` key to switch to the package manager REPL:
 
 ```{julia}
 (@v1.8) Pkg> add https://github.com/Hua-Zhou/ClinicalTrialOptm.jl.git
@@ -79,7 +77,7 @@ ctry = Country(m, s², l, u, c₀, c, q, d, T₀, Td)
 
 ### `ClinicalTrial`
 
-```@doc 
+```@docs 
 ClinicalTrial
 ```
 
