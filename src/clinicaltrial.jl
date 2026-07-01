@@ -196,9 +196,9 @@ function Base.show(io::IO, ct::ClinicalTrial)
             ["", "", "", "\$/center", "\$/center/month", "\$/patient", "", "", "", ""]
         ),
         formatters = (
-            ft_printf("%5.2f", [2, 3, 7]), 
-            ft_printf("%8.0f", [4, 5, 6]),
-            ft_printf("%i", [1, 8, 9, 10])
+            fmt__printf("%5.2f", [2, 3, 7]), 
+            fmt__printf("%8.0f", [4, 5, 6]),
+            fmt__printf("%i", [1, 8, 9, 10])
         ),
         crop = :none
     )
