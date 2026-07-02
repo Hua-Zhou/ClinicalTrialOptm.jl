@@ -189,18 +189,17 @@ function Base.show(io::IO, ct::ClinicalTrial)
     pretty_table(
         io, 
         tbl,
-        header = (
+        column_labels = (
             ["Country", "mean(λ)", "var(λ)", 
             "init. cost", "maint. cost", "enroll. cost",
             "drop out rate", "min. centers", "max. centers", "centers"],
             ["", "", "", "\$/center", "\$/center/month", "\$/patient", "", "", "", ""]
         ),
-        formatters = (
+        formatters = [
             fmt__printf("%5.2f", [2, 3, 7]), 
             fmt__printf("%8.0f", [4, 5, 6]),
             fmt__printf("%i", [1, 8, 9, 10])
-        ),
-        crop = :none
+        ],
     )
     println(io)
     println(io)
