@@ -1,6 +1,6 @@
 oa_solver = optimizer_with_attributes(HiGHS.Optimizer,
 MOI.Silent() => true,
-"mip_feasibility_tolerance" => 1e-8,
+"mip_feasibility_tolerance" => 1e-6,
 "mip_rel_gap" => 1e-6,
 )
 conic_solver = optimizer_with_attributes(SCS.Optimizer, 
